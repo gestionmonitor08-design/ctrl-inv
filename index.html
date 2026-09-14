@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Control de Inventario</title>
+
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- MENÚ LATERAL -->
+    <aside class="sidebar">
+
+      <div class="logo">
+        <div class="logo-icon">CI</div>
+        <div class="logo-text">
+          <strong>CTRL-INV</strong>
+          <span>Control de Inventario</span>
+        </div>
+      </div>
+
+      <nav class="menu">
+
+        <button class="menu-item active" data-vista="inicio">
+          <span>⌂</span>
+          <span>Inicio</span>
+        </button>
+
+        <button class="menu-item" data-vista="productos">
+          <span>▣</span>
+          <span>Productos</span>
+        </button>
+
+        <button class="menu-item" data-vista="categorias">
+          <span>◫</span>
+          <span>Categorías</span>
+        </button>
+
+        <button class="menu-item" data-vista="proveedores">
+          <span>▤</span>
+          <span>Proveedores</span>
+        </button>
+
+        <button class="menu-item" data-vista="clientes">
+          <span>♙</span>
+          <span>Clientes</span>
+        </button>
+
+        <div class="menu-separador"></div>
+
+        <button class="menu-item" data-vista="inventario">
+          <span>▥</span>
+          <span>Inventario</span>
+        </button>
+
+        <button class="menu-item" data-vista="compras">
+          <span>↓</span>
+          <span>Compras</span>
+        </button>
+
+        <button class="menu-item" data-vista="ventas">
+          <span>↑</span>
+          <span>Notas de Venta</span>
+        </button>
+
+        <div class="menu-separador"></div>
+
+        <button class="menu-item" data-vista="reportes">
+          <span>▦</span>
+          <span>Reportes</span>
+        </button>
+
+        <button class="menu-item" data-vista="configuracion">
+          <span>⚙</span>
+          <span>Configuración</span>
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <span>Sistema de inventario</span>
+        <small>v1.0</small>
+      </div>
+
+    </aside>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main">
+
+      <!-- ENCABEZADO -->
+      <header class="topbar">
+
+        <button id="btnMenu" class="btn-menu">
+          ☰
+        </button>
+
+        <div class="breadcrumb">
+          <span>CTRL-INV</span>
+          <span>/</span>
+          <strong id="tituloVista">Inicio</strong>
+        </div>
+
+        <div class="usuario">
+          <div class="usuario-avatar">U</div>
+
+          <div class="usuario-info">
+            <strong>Usuario</strong>
+            <span>Administrador</span>
+          </div>
+        </div>
+
+      </header>
+
+
+      <!-- ÁREA DE CONTENIDO -->
+      <section id="contenido" class="contenido">
+
+        <!-- DASHBOARD INICIAL -->
+        <div id="vista-inicio" class="vista activa">
+
+          <div class="pagina-header">
+
+            <div>
+              <h1>Inicio</h1>
+              <p>Resumen general del sistema</p>
+            </div>
+
+          </div>
+
+
+          <!-- TARJETAS -->
+          <div class="tarjetas">
+
+            <div class="tarjeta">
+
+              <div class="tarjeta-icono">
+                ▣
+              </div>
+
+              <div>
+                <span>Productos</span>
+                <strong id="totalProductos">—</strong>
+              </div>
+
+            </div>
+
+
+            <div class="tarjeta">
+
+              <div class="tarjeta-icono">
+                ▥
+              </div>
+
+              <div>
+                <span>Existencias</span>
+                <strong id="totalExistencias">—</strong>
+              </div>
+
+            </div>
+
+
+            <div class="tarjeta">
+
+              <div class="tarjeta-icono">
+                ↓
+              </div>
+
+              <div>
+                <span>Compras</span>
+                <strong id="totalCompras">—</strong>
+              </div>
+
+            </div>
+
+
+            <div class="tarjeta">
+
+              <div class="tarjeta-icono">
+                ↑
+              </div>
+
+              <div>
+                <span>Notas de Venta</span>
+                <strong id="totalVentas">—</strong>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- MENSAJE INICIAL -->
+          <div class="panel">
+
+            <div class="panel-header">
+              <div>
+                <h2>Panel de control</h2>
+                <p>Selecciona un módulo del menú para comenzar.</p>
+              </div>
+            </div>
+
+            <div class="panel-body">
+
+              <div class="estado-inicial">
+
+                <div class="estado-icono">
+                  ✓
+                </div>
+
+                <div>
+                  <h3>Frontend conectado a la estructura del sistema</h3>
+                  <p>
+                    La interfaz inicial está preparada para conectarse
+                    con la API de Google Apps Script.
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- LAS DEMÁS VISTAS SE AGREGARÁN POSTERIORMENTE -->
+
+        <div id="vista-productos" class="vista"></div>
+
+        <div id="vista-categorias" class="vista"></div>
+
+        <div id="vista-proveedores" class="vista"></div>
+
+        <div id="vista-clientes" class="vista"></div>
+
+        <div id="vista-inventario" class="vista"></div>
+
+        <div id="vista-compras" class="vista"></div>
+
+        <div id="vista-ventas" class="vista"></div>
+
+        <div id="vista-reportes" class="vista"></div>
+
+        <div id="vista-configuracion" class="vista"></div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- JAVASCRIPT PRINCIPAL -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
