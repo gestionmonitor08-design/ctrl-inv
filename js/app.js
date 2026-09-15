@@ -76,14 +76,14 @@ document.addEventListener('DOMContentLoaded', function () {
    * Cargar productos desde Google Apps Script
    */
   async function cargarProductos() {
-
+  
     const contenedor =
       document.getElementById('vista-productos');
-
+  
     if (!contenedor) {
       return;
     }
-
+  
     contenedor.innerHTML = `
       <div class="panel">
         <div class="panel-body">
@@ -91,38 +91,49 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       </div>
     `;
-
+  
     try {
-
+  
+      /*
+       * Usamos inventario porque este endpoint
+       * devuelve productos + existencia actual.
+       */
       const respuesta = await apiGet({
-        accion: 'productos'
+        accion: 'inventario'
       });
-
+  
       if (!respuesta.ok) {
         throw new Error(
-          respuesta.mensaje || 'No se pudieron obtener los productos.'
+          respuesta.mensaje ||
+          'No se pudo obtener el inventario.'
         );
       }
-
+  
       mostrarProductos(respuesta.datos);
-
+  
     } catch (error) {
-
+  
       contenedor.innerHTML = `
         <div class="panel">
           <div class="panel-body">
+  
             <div class="estado-inicial">
-              <div class="estado-icono">!</div>
-
+  
+              <div class="estado-icono">
+                !
+              </div>
+  
               <div>
                 <h3>Error al cargar productos</h3>
                 <p>${error.message}</p>
               </div>
+  
             </div>
+  
           </div>
         </div>
       `;
-
+  
       console.error(
         'Error al cargar productos:',
         error
@@ -183,11 +194,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
           <td>${producto.UNIDAD_MEDIDA}</td>
 
-          <td>S/ ${Number(producto.PRECIO_VENTA).toFixed(2)}</td>
-
-          <td>S/ ${Number(producto.COSTO_UNITARIO).toFixed(2)}</td>
-
-          <td>
+          <td style="text-align:center;">
+            <strong>${Number(producto.existencia)}</strong>
+          </td>
+          
+          <td style="text-align:right;">
+            S/ ${Number(producto.PRECIO_VENTA).toFixed(2)}
+          </td>
+          
+          <td style="text-align:right;">
+            S/ ${Number(producto.COSTO_UNITARIO).toFixed(2)}
+          </td>
+          
+          <td style="text-align:center;">
             ${estado}
           </td>
 
@@ -250,6 +269,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                   <th style="text-align:left;padding:12px;border-bottom:1px solid var(--color-border);">
                     Unidad
+                  </th>
+
+                  <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+                    Existencia
                   </th>
 
                   <th style="text-align:right;padding:12px;border-bottom:1px solid var(--color-border);">
