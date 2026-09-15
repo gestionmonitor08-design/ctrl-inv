@@ -863,6 +863,85 @@ function mostrarFormularioNuevoProducto() {
     }
   
   }
+
+function mostrarFormularioEditarProducto(idProducto) {
+
+  const contenedor =
+    document.getElementById('vista-productos');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="panel">
+      <div class="panel-body">
+        <p>Cargando producto...</p>
+      </div>
+    </div>
+  `;
+
+  cargarProductoParaEditar(idProducto);
+}
+
+  async function cargarProductoParaEditar(idProducto) {
+  
+    const contenedor =
+      document.getElementById('vista-productos');
+  
+    try {
+  
+      const respuesta = await apiGet({
+        accion: 'producto',
+        idProducto: idProducto
+      });
+  
+      if (!respuesta.ok) {
+        throw new Error(
+          respuesta.mensaje ||
+          'No se pudo obtener el producto.'
+        );
+      }
+  
+      const producto = respuesta.datos;
+  
+      if (!producto) {
+        throw new Error(
+          'No se encontró el producto.'
+        );
+      }
+  
+      mostrarFormularioEditarProductoDatos(producto);
+  
+    } catch (error) {
+  
+      console.error(
+        'Error al cargar producto:',
+        error
+      );
+  
+      contenedor.innerHTML = `
+        <div class="panel">
+          <div class="panel-body">
+  
+            <div class="estado-inicial">
+  
+              <div class="estado-icono">
+                !
+              </div>
+  
+              <div>
+                <h3>Error al cargar producto</h3>
+                <p>${error.message}</p>
+              </div>
+  
+            </div>
+  
+          </div>
+        </div>
+      `;
+    }
+  }
   
   /*
    * Eventos del menú
