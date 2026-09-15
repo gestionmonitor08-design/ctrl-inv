@@ -159,11 +159,16 @@ function mostrarProductos(productos) {
     productos = [];
   }
 
+  let productosFiltrados = productos;
+
+  let textoBusqueda = '';
+  
+  let filtroEstado = 'todos';
 
   let filas = '';
 
 
-  productos.forEach(function (producto) {
+  productosFiltrados.forEach(function (producto) {
 
     const estado = producto.ACTIVO
       ? 'Activo'
@@ -294,15 +299,65 @@ function mostrarProductos(productos) {
     <div class="panel">
 
       <div class="panel-header">
-
+      
         <div>
           <h2>Productos registrados</h2>
-
           <p>
             Productos, existencias y costos actuales.
           </p>
         </div>
-
+      
+      </div>
+      
+      
+      <div
+        style="
+          display:grid;
+          grid-template-columns:minmax(250px,1fr) 180px;
+          gap:12px;
+          margin-bottom:18px;
+        "
+      >
+      
+        <input
+          type="text"
+          id="buscarProducto"
+          placeholder="Buscar por código o nombre..."
+          style="
+            width:100%;
+            padding:10px 12px;
+            border:1px solid var(--color-border);
+            border-radius:8px;
+            font-size:13px;
+          "
+        >
+      
+        <select
+          id="filtroEstadoProducto"
+          style="
+            width:100%;
+            padding:10px 12px;
+            border:1px solid var(--color-border);
+            border-radius:8px;
+            font-size:13px;
+            background:white;
+          "
+        >
+      
+          <option value="todos">
+            Todos
+          </option>
+      
+          <option value="activos">
+            Activos
+          </option>
+      
+          <option value="inactivos">
+            Inactivos
+          </option>
+      
+        </select>
+      
       </div>
 
 
@@ -311,6 +366,7 @@ function mostrarProductos(productos) {
         <div style="overflow-x:auto;">
 
           <table
+            id="tablaProductos"
             style="
               width:100%;
               border-collapse:collapse;
@@ -320,7 +376,9 @@ function mostrarProductos(productos) {
 
             <thead>
 
-              <tr>
+              <tr
+                data-activo="${producto.ACTIVO ? 'true' : 'false'}"
+              >
 
                 <th style="text-align:left;padding:12px;border-bottom:1px solid var(--color-border);">
                   ID
@@ -373,7 +431,6 @@ function mostrarProductos(productos) {
 
     </div>
   `;
-
 
   /*
    * Botón Nuevo Producto
@@ -433,6 +490,99 @@ function mostrarProductos(productos) {
 
 }
 
+  const buscarProducto =
+    document.getElementById('buscarProducto');
+  
+  const filtroEstadoProducto =
+    document.getElementById('filtroEstadoProducto');
+  
+  
+  if (buscarProducto) {
+  
+    buscarProducto.addEventListener(
+      'input',
+      aplicarFiltrosProductos
+    );
+  
+  }
+  
+  
+  if (filtroEstadoProducto) {
+  
+    filtroEstadoProducto.addEventListener(
+      'change',
+      aplicarFiltrosProductos
+    );
+  
+  }
+
+function aplicarFiltrosProductos() {
+
+  const campoBusqueda =
+    document.getElementById('buscarProducto');
+
+  const selectorEstado =
+    document.getElementById('filtroEstadoProducto');
+
+
+  if (!campoBusqueda || !selectorEstado) {
+    return;
+  }
+
+
+  const texto =
+    campoBusqueda.value
+      .trim()
+      .toLowerCase();
+
+
+  const estado =
+    selectorEstado.value;
+
+
+  const filas =
+    document.querySelectorAll(
+      '#tablaProductos tbody tr'
+    );
+
+
+  filas.forEach(function (fila) {
+
+    const textoFila =
+      fila.textContent.toLowerCase();
+
+
+    const coincideBusqueda =
+      !texto ||
+      textoFila.includes(texto);
+
+
+    const activo =
+      fila.getAttribute('data-activo') === 'true';
+
+
+    let coincideEstado = true;
+
+
+    if (estado === 'activos') {
+      coincideEstado = activo;
+    }
+
+
+    if (estado === 'inactivos') {
+      coincideEstado = !activo;
+    }
+
+
+    fila.style.display =
+      coincideBusqueda && coincideEstado
+        ? ''
+        : 'none';
+
+  });
+
+}
+  
 function mostrarFormularioNuevoProducto() {
 
   const contenedor =
