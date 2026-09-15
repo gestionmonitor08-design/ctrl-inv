@@ -209,7 +209,11 @@ function mostrarProductos(productos) {
           Acciones
         </th>
 
-        <td style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+        <td style="
+          text-align:center;
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
         
           <button
             class="btn-editar-producto"
@@ -223,9 +227,29 @@ function mostrarProductos(productos) {
               cursor:pointer;
               font-size:12px;
               font-weight:600;
+              margin-right:5px;
             "
           >
             Editar
+          </button>
+        
+        
+          <button
+            class="btn-estado-producto"
+            data-id="${producto.ID_PRODUCTO}"
+            data-activo="${producto.ACTIVO}"
+            style="
+              border:1px solid var(--color-border);
+              background:white;
+              color:${producto.ACTIVO ? 'var(--color-danger)' : 'var(--color-success)'};
+              padding:7px 12px;
+              border-radius:7px;
+              cursor:pointer;
+              font-size:12px;
+              font-weight:600;
+            "
+          >
+            ${producto.ACTIVO ? 'Desactivar' : 'Activar'}
           </button>
         
         </td>
@@ -378,6 +402,30 @@ function mostrarProductos(productos) {
           );
   
         mostrarFormularioEditarProducto(idProducto);
+  
+      });
+  
+    });
+
+    document
+    .querySelectorAll('.btn-estado-producto')
+    .forEach(function (boton) {
+  
+      boton.addEventListener('click', function () {
+  
+        const idProducto =
+          Number(
+            boton.getAttribute('data-id')
+          );
+  
+        const activo =
+          boton.getAttribute('data-activo') === 'true' ||
+          boton.getAttribute('data-activo') === '1';
+  
+        cambiarEstadoProductoFrontend(
+          idProducto,
+          !activo
+        );
   
       });
   
@@ -1465,6 +1513,81 @@ function mostrarFormularioEditarProductoDatos(producto) {
     }
   
   }
+
+  async function cambiarEstadoProductoFrontend(idProducto, nuevoEstado) {
+  
+    const accionTexto =
+      nuevoEstado
+        ? 'activar'
+        : 'desactivar';
+  
+  
+    const confirmar =
+      confirm(
+        '¿Está seguro de que desea ' +
+        accionTexto +
+        ' este producto?'
+      );
+  
+  
+    if (!confirmar) {
+      return;
+    }
+  
+  
+    try {
+  
+      const respuesta =
+        await apiPost({
+  
+          accion:
+            'cambiarEstadoProducto',
+  
+          idProducto:
+            Number(idProducto),
+  
+          activo:
+            nuevoEstado
+  
+        });
+  
+  
+      if (!respuesta.ok) {
+  
+        throw new Error(
+          respuesta.mensaje ||
+          'No se pudo cambiar el estado del producto.'
+        );
+  
+      }
+  
+  
+      alert(
+        respuesta.mensaje ||
+        'Estado actualizado correctamente.'
+      );
+  
+  
+      cargarProductos();
+  
+  
+    } catch (error) {
+  
+      console.error(
+        'Error al cambiar estado del producto:',
+        error
+      );
+  
+  
+      alert(
+        'No se pudo cambiar el estado del producto.\n\n' +
+        error.message
+      );
+  
+    }
+  
+  }
+
   
   /*
    * Eventos del menú
