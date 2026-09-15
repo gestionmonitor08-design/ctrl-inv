@@ -154,29 +154,22 @@ function mostrarProductos(productos) {
     return;
   }
 
-
   if (!Array.isArray(productos)) {
     productos = [];
   }
 
-  let productosFiltrados = productos;
-
-  let textoBusqueda = '';
-  
-  let filtroEstado = 'todos';
-
   let filas = '';
 
+  productos.forEach(function (producto) {
 
-  productosFiltrados.forEach(function (producto) {
-
-    const estado = producto.ACTIVO
-      ? 'Activo'
-      : 'Inactivo';
-
+    const activo =
+      producto.ACTIVO === true ||
+      producto.ACTIVO === 'TRUE' ||
+      producto.ACTIVO === 1 ||
+      producto.ACTIVO === '1';
 
     filas += `
-      <tr>
+      <tr data-activo="${activo ? 'true' : 'false'}">
 
         <td style="padding:12px;border-bottom:1px solid var(--color-border);">
           ${producto.ID_PRODUCTO}
@@ -205,21 +198,28 @@ function mostrarProductos(productos) {
         <td style="text-align:right;padding:12px;border-bottom:1px solid var(--color-border);">
           S/ ${Number(producto.COSTO_UNITARIO || 0).toFixed(2)}
         </td>
-        
-        <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
-          Estado
-        </th>
-        
-        <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
-          Acciones
-        </th>
+
+        <td style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+          <span style="
+            display:inline-block;
+            padding:4px 9px;
+            border-radius:12px;
+            font-size:11px;
+            font-weight:600;
+            background:${activo ? '#e8f5e9' : '#ffebee'};
+            color:${activo ? 'var(--color-success)' : 'var(--color-danger)'};
+          ">
+            ${activo ? 'Activo' : 'Inactivo'}
+          </span>
+        </td>
 
         <td style="
           text-align:center;
           padding:12px;
           border-bottom:1px solid var(--color-border);
+          white-space:nowrap;
         ">
-        
+
           <button
             class="btn-editar-producto"
             data-id="${producto.ID_PRODUCTO}"
@@ -237,16 +237,15 @@ function mostrarProductos(productos) {
           >
             Editar
           </button>
-        
-        
+
           <button
             class="btn-estado-producto"
             data-id="${producto.ID_PRODUCTO}"
-            data-activo="${producto.ACTIVO}"
+            data-activo="${activo ? 'true' : 'false'}"
             style="
               border:1px solid var(--color-border);
               background:white;
-              color:${producto.ACTIVO ? 'var(--color-danger)' : 'var(--color-success)'};
+              color:${activo ? 'var(--color-danger)' : 'var(--color-success)'};
               padding:7px 12px;
               border-radius:7px;
               cursor:pointer;
@@ -254,9 +253,9 @@ function mostrarProductos(productos) {
               font-weight:600;
             "
           >
-            ${producto.ACTIVO ? 'Desactivar' : 'Activar'}
+            ${activo ? 'Desactivar' : 'Activar'}
           </button>
-        
+
         </td>
 
       </tr>
@@ -299,17 +298,18 @@ function mostrarProductos(productos) {
     <div class="panel">
 
       <div class="panel-header">
-      
+
         <div>
           <h2>Productos registrados</h2>
+
           <p>
             Productos, existencias y costos actuales.
           </p>
         </div>
-      
+
       </div>
-      
-      
+
+
       <div
         style="
           display:grid;
@@ -318,7 +318,7 @@ function mostrarProductos(productos) {
           margin-bottom:18px;
         "
       >
-      
+
         <input
           type="text"
           id="buscarProducto"
@@ -331,7 +331,7 @@ function mostrarProductos(productos) {
             font-size:13px;
           "
         >
-      
+
         <select
           id="filtroEstadoProducto"
           style="
@@ -343,21 +343,21 @@ function mostrarProductos(productos) {
             background:white;
           "
         >
-      
+
           <option value="todos">
             Todos
           </option>
-      
+
           <option value="activos">
             Activos
           </option>
-      
+
           <option value="inactivos">
             Inactivos
           </option>
-      
+
         </select>
-      
+
       </div>
 
 
@@ -376,9 +376,7 @@ function mostrarProductos(productos) {
 
             <thead>
 
-              <tr
-                data-activo="${producto.ACTIVO ? 'true' : 'false'}"
-              >
+              <tr>
 
                 <th style="text-align:left;padding:12px;border-bottom:1px solid var(--color-border);">
                   ID
@@ -412,6 +410,10 @@ function mostrarProductos(productos) {
                   Estado
                 </th>
 
+                <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Acciones
+                </th>
+
               </tr>
 
             </thead>
@@ -432,6 +434,7 @@ function mostrarProductos(productos) {
     </div>
   `;
 
+
   /*
    * Botón Nuevo Producto
    */
@@ -447,46 +450,83 @@ function mostrarProductos(productos) {
 
   }
 
-    document
+
+  /*
+   * Botones Editar
+   */
+  document
     .querySelectorAll('.btn-editar-producto')
     .forEach(function (boton) {
-  
+
       boton.addEventListener('click', function () {
-  
+
         const idProducto =
           Number(
             boton.getAttribute('data-id')
           );
-  
+
         mostrarFormularioEditarProducto(idProducto);
-  
+
       });
-  
+
     });
 
-    document
+
+  /*
+   * Botones Activar / Desactivar
+   */
+  document
     .querySelectorAll('.btn-estado-producto')
     .forEach(function (boton) {
-  
+
       boton.addEventListener('click', function () {
-  
+
         const idProducto =
           Number(
             boton.getAttribute('data-id')
           );
-  
+
         const activo =
-          boton.getAttribute('data-activo') === 'true' ||
-          boton.getAttribute('data-activo') === '1';
-  
+          boton.getAttribute('data-activo') === 'true';
+
         cambiarEstadoProductoFrontend(
           idProducto,
           !activo
         );
-  
+
       });
-  
+
     });
+
+
+  /*
+   * Búsqueda de productos
+   */
+  const buscarProducto =
+    document.getElementById('buscarProducto');
+
+  const filtroEstadoProducto =
+    document.getElementById('filtroEstadoProducto');
+
+
+  if (buscarProducto) {
+
+    buscarProducto.addEventListener(
+      'input',
+      aplicarFiltrosProductos
+    );
+
+  }
+
+
+  if (filtroEstadoProducto) {
+
+    filtroEstadoProducto.addEventListener(
+      'change',
+      aplicarFiltrosProductos
+    );
+
+  }
 
 }
 
