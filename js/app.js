@@ -200,9 +200,34 @@ function mostrarProductos(productos) {
         <td style="text-align:right;padding:12px;border-bottom:1px solid var(--color-border);">
           S/ ${Number(producto.COSTO_UNITARIO || 0).toFixed(2)}
         </td>
+        
+        <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+          Estado
+        </th>
+        
+        <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+          Acciones
+        </th>
 
         <td style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
-          ${estado}
+        
+          <button
+            class="btn-editar-producto"
+            data-id="${producto.ID_PRODUCTO}"
+            style="
+              border:1px solid var(--color-border);
+              background:white;
+              color:var(--color-primary);
+              padding:7px 12px;
+              border-radius:7px;
+              cursor:pointer;
+              font-size:12px;
+              font-weight:600;
+            "
+          >
+            Editar
+          </button>
+        
         </td>
 
       </tr>
@@ -340,6 +365,23 @@ function mostrarProductos(productos) {
     );
 
   }
+
+    document
+    .querySelectorAll('.btn-editar-producto')
+    .forEach(function (boton) {
+  
+      boton.addEventListener('click', function () {
+  
+        const idProducto =
+          Number(
+            boton.getAttribute('data-id')
+          );
+  
+        mostrarFormularioEditarProducto(idProducto);
+  
+      });
+  
+    });
 
 }
 
