@@ -679,6 +679,149 @@ function mostrarFormularioNuevoProducto() {
 
 }
 
+  async function guardarNuevoProducto(evento) {
+  
+    evento.preventDefault();
+  
+    const boton =
+      document.querySelector(
+        '#formNuevoProducto button[type="submit"]'
+      );
+  
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = 'Guardando...';
+    }
+  
+  
+    try {
+  
+      const codigo =
+        document.getElementById('productoCodigo').value.trim();
+  
+      const nombre =
+        document.getElementById('productoNombre').value.trim();
+  
+      const categoria =
+        document.getElementById('productoCategoria').value;
+  
+      const unidad =
+        document.getElementById('productoUnidad').value.trim();
+  
+      const precio =
+        Number(
+          document.getElementById('productoPrecio').value
+        ) || 0;
+  
+      const costo =
+        Number(
+          document.getElementById('productoCosto').value
+        ) || 0;
+  
+      const activo =
+        document.getElementById('productoActivo').checked;
+  
+  
+      /*
+       * Validación básica del frontend
+       */
+      if (!codigo) {
+        throw new Error(
+          'El código del producto es obligatorio.'
+        );
+      }
+  
+      if (!nombre) {
+        throw new Error(
+          'El nombre del producto es obligatorio.'
+        );
+      }
+  
+  
+      /*
+       * Enviar producto a Apps Script
+       */
+      const respuesta = await apiPost({
+  
+        accion: 'crearProducto',
+  
+        datos: {
+  
+          codigo: codigo,
+  
+          nombre: nombre,
+  
+          categoriaId:
+            categoria
+              ? Number(categoria)
+              : '',
+  
+          unidadMedida: unidad,
+  
+          precioVenta: precio,
+  
+          costoUnitario: costo,
+  
+          activo: activo
+  
+        }
+  
+      });
+  
+  
+      /*
+       * Verificar respuesta del backend
+       */
+      if (!respuesta.ok) {
+  
+        throw new Error(
+          respuesta.mensaje ||
+          'No se pudo crear el producto.'
+        );
+  
+      }
+  
+  
+      /*
+       * Confirmación
+       */
+      alert(
+        'Producto creado correctamente.\n\n' +
+        'Código: ' + respuesta.producto.CODIGO +
+        '\nNombre: ' + respuesta.producto.NOMBRE
+      );
+  
+  
+      /*
+       * Volver al listado
+       */
+      cargarProductos();
+  
+  
+    } catch (error) {
+  
+      console.error(
+        'Error al crear producto:',
+        error
+      );
+  
+      alert(
+        'No se pudo crear el producto.\n\n' +
+        error.message
+      );
+  
+  
+    } finally {
+  
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = 'Guardar producto';
+      }
+  
+    }
+  
+  }
+  
   /*
    * Eventos del menú
    */
