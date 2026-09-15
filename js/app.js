@@ -942,6 +942,529 @@ function mostrarFormularioEditarProducto(idProducto) {
       `;
     }
   }
+
+function mostrarFormularioEditarProductoDatos(producto) {
+
+  const contenedor =
+    document.getElementById('vista-productos');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+        <h1>Editar producto</h1>
+        <p>Modificar la información del producto</p>
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Datos del producto</h2>
+          <p>
+            Modifique la información que desea actualizar.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <form id="formEditarProducto">
+
+
+          <div style="
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:18px;
+          ">
+
+
+            <!-- CÓDIGO -->
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Código *
+              </label>
+
+              <input
+                type="text"
+                id="editarProductoCodigo"
+                value="${producto.codigo || ''}"
+                required
+                maxlength="50"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <!-- NOMBRE -->
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Nombre *
+              </label>
+
+              <input
+                type="text"
+                id="editarProductoNombre"
+                value="${producto.nombre || ''}"
+                required
+                maxlength="150"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <!-- CATEGORÍA -->
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                ID Categoría
+              </label>
+
+              <input
+                type="number"
+                id="editarProductoCategoria"
+                value="${producto.categoriaId || ''}"
+                min="1"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <!-- UNIDAD -->
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Unidad de medida
+              </label>
+
+              <input
+                type="text"
+                id="editarProductoUnidad"
+                value="${producto.unidadMedida || ''}"
+                maxlength="20"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <!-- PRECIO -->
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Precio de venta
+              </label>
+
+              <input
+                type="number"
+                id="editarProductoPrecio"
+                value="${Number(producto.precioVenta || 0)}"
+                min="0"
+                step="0.01"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <!-- COSTO -->
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Costo unitario
+              </label>
+
+              <input
+                type="number"
+                id="editarProductoCosto"
+                value="${Number(producto.costoUnitario || 0)}"
+                min="0"
+                step="0.01"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- ESTADO -->
+
+          <div style="
+            margin-top:20px;
+            padding:14px;
+            background:var(--color-background);
+            border-radius:8px;
+          ">
+
+            <label style="
+              display:flex;
+              align-items:center;
+              gap:8px;
+              font-size:13px;
+              cursor:pointer;
+            ">
+
+              <input
+                type="checkbox"
+                id="editarProductoActivo"
+                ${producto.activo ? 'checked' : ''}
+              >
+
+              Producto activo
+
+            </label>
+
+          </div>
+
+
+          <!-- BOTONES -->
+
+          <div style="
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:22px;
+          ">
+
+            <button
+              type="button"
+              id="btnCancelarEditarProducto"
+              style="
+                border:1px solid var(--color-border);
+                background:white;
+                color:var(--color-text);
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+              "
+            >
+              Cancelar
+            </button>
+
+
+            <button
+              type="submit"
+              style="
+                border:none;
+                background:var(--color-primary);
+                color:white;
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+                font-weight:600;
+              "
+            >
+              Guardar cambios
+            </button>
+
+          </div>
+
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+
+  /*
+   * Cancelar
+   */
+
+  document
+    .getElementById('btnCancelarEditarProducto')
+    .addEventListener('click', function () {
+
+      cargarProductos();
+
+    });
+
+
+  /*
+   * Guardar cambios
+   */
+
+  document
+    .getElementById('formEditarProducto')
+    .addEventListener('submit', function (evento) {
+
+      guardarEdicionProducto(
+        evento,
+        producto.ID_PRODUCTO || producto.idProducto
+      );
+
+    });
+
+}
+
+  async function guardarEdicionProducto(evento, idProducto) {
+  
+    evento.preventDefault();
+  
+    const boton =
+      document.querySelector(
+        '#formEditarProducto button[type="submit"]'
+      );
+  
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = 'Guardando...';
+    }
+  
+  
+    try {
+  
+      const codigo =
+        document
+          .getElementById('editarProductoCodigo')
+          .value
+          .trim();
+  
+      const nombre =
+        document
+          .getElementById('editarProductoNombre')
+          .value
+          .trim();
+  
+      const categoria =
+        document
+          .getElementById('editarProductoCategoria')
+          .value;
+  
+      const unidad =
+        document
+          .getElementById('editarProductoUnidad')
+          .value
+          .trim();
+  
+      const precio =
+        Number(
+          document
+            .getElementById('editarProductoPrecio')
+            .value
+        ) || 0;
+  
+      const costo =
+        Number(
+          document
+            .getElementById('editarProductoCosto')
+            .value
+        ) || 0;
+  
+      const activo =
+        document
+          .getElementById('editarProductoActivo')
+          .checked;
+  
+  
+      /*
+       * Validaciones básicas
+       */
+  
+      if (!codigo) {
+        throw new Error(
+          'El código del producto es obligatorio.'
+        );
+      }
+  
+      if (!nombre) {
+        throw new Error(
+          'El nombre del producto es obligatorio.'
+        );
+      }
+  
+      if (precio < 0) {
+        throw new Error(
+          'El precio de venta no puede ser negativo.'
+        );
+      }
+  
+      if (costo < 0) {
+        throw new Error(
+          'El costo unitario no puede ser negativo.'
+        );
+      }
+  
+  
+      /*
+       * Enviar cambios al backend
+       */
+  
+      const respuesta = await apiPost({
+  
+        accion: 'editarProducto',
+  
+        idProducto: Number(idProducto),
+  
+        datos: {
+  
+          codigo: codigo,
+  
+          nombre: nombre,
+  
+          categoriaId:
+            categoria
+              ? Number(categoria)
+              : '',
+  
+          unidadMedida: unidad,
+  
+          precioVenta: precio,
+  
+          costoUnitario: costo,
+  
+          activo: activo
+  
+        }
+  
+      });
+  
+  
+      /*
+       * Verificar respuesta
+       */
+  
+      if (!respuesta.ok) {
+  
+        throw new Error(
+          respuesta.mensaje ||
+          'No se pudo actualizar el producto.'
+        );
+  
+      }
+  
+  
+      /*
+       * Confirmación
+       */
+  
+      alert(
+        'Producto actualizado correctamente.'
+      );
+  
+  
+      /*
+       * Volver al listado
+       */
+  
+      cargarProductos();
+  
+  
+    } catch (error) {
+  
+      console.error(
+        'Error al editar producto:',
+        error
+      );
+  
+      alert(
+        'No se pudo actualizar el producto.\n\n' +
+        error.message
+      );
+  
+  
+    } finally {
+  
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = 'Guardar cambios';
+      }
+  
+    }
+  
+  }
   
   /*
    * Eventos del menú
