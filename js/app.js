@@ -69,9 +69,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nombreVista === 'productos') {
       cargarProductos();
     }
+    
     if (nombreVista === 'categorias') {
       cargarCategorias();
     }  
+    
+    if (nombreVista === 'proveedores') {
+      cargarProveedores();
+    }    
   }
 
 
@@ -3282,6 +3287,1882 @@ async function cambiarEstadoCategoriaFrontend(
   }
 
 }
+
+/*
+ * ============================================================
+ * MÓDULO: PROVEEDORES
+ * ============================================================
+ */
+
+
+/*
+ * ------------------------------------------------------------
+ * Cargar proveedores
+ * ------------------------------------------------------------
+ */
+async function cargarProveedores() {
+
+  const contenedor =
+    document.getElementById('vista-proveedores');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="panel">
+      <div class="panel-body">
+        <p>Cargando proveedores...</p>
+      </div>
+    </div>
+  `;
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'proveedores'
+      });
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudieron cargar los proveedores.'
+      );
+    }
+
+    mostrarProveedores(respuesta.datos);
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar proveedores:',
+      error
+    );
+
+    contenedor.innerHTML = `
+      <div class="panel">
+        <div class="panel-body">
+
+          <div class="estado-inicial">
+
+            <div class="estado-icono">
+              !
+            </div>
+
+            <div>
+              <h3>Error al cargar proveedores</h3>
+              <p>${error.message}</p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Mostrar proveedores
+ * ------------------------------------------------------------
+ */
+function mostrarProveedores(proveedores) {
+
+  const contenedor =
+    document.getElementById('vista-proveedores');
+
+  if (!contenedor) {
+    return;
+  }
+
+  if (!Array.isArray(proveedores)) {
+    proveedores = [];
+  }
+
+  let filas = '';
+
+  proveedores.forEach(function(proveedor) {
+
+    const activo =
+      proveedor.ACTIVO === true ||
+      proveedor.ACTIVO === 'TRUE' ||
+      proveedor.ACTIVO === 1 ||
+      proveedor.ACTIVO === '1';
+
+    filas += `
+      <tr
+        data-activo="${activo ? 'true' : 'false'}"
+        style="
+          border-bottom:1px solid var(--color-border);
+        "
+      >
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${proveedor.ID_PROVEEDOR}
+        </td>
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${proveedor.NOMBRE || ''}
+        </td>
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${proveedor.DOCUMENTO || ''}
+        </td>
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${proveedor.TELEFONO || ''}
+        </td>
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${proveedor.EMAIL || ''}
+        </td>
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${proveedor.DIRECCION || ''}
+        </td>
+
+        <td style="
+          padding:12px;
+          text-align:center;
+          border-bottom:1px solid var(--color-border);
+        ">
+
+          <span
+            style="
+              display:inline-block;
+              padding:4px 9px;
+              border-radius:12px;
+              font-size:11px;
+              font-weight:600;
+              background:${
+                activo
+                  ? 'var(--color-success-light, #dcfce7)'
+                  : 'var(--color-danger-light, #fee2e2)'
+              };
+              color:${
+                activo
+                  ? 'var(--color-success, #166534)'
+                  : 'var(--color-danger, #991b1b)'
+              };
+            "
+          >
+            ${activo ? 'Activo' : 'Inactivo'}
+          </span>
+
+        </td>
+
+        <td style="
+          padding:12px;
+          text-align:center;
+          border-bottom:1px solid var(--color-border);
+        ">
+
+          <div style="
+            display:flex;
+            justify-content:center;
+            gap:6px;
+            flex-wrap:wrap;
+          ">
+
+            <button
+              type="button"
+              class="btn-editar-proveedor"
+              data-id="${proveedor.ID_PROVEEDOR}"
+              style="
+                border:1px solid var(--color-border);
+                background:white;
+                padding:7px 10px;
+                border-radius:7px;
+                cursor:pointer;
+                font-size:12px;
+              "
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              class="btn-estado-proveedor"
+              data-id="${proveedor.ID_PROVEEDOR}"
+              data-activo="${activo ? 'true' : 'false'}"
+              style="
+                border:none;
+                background:var(--color-primary);
+                color:white;
+                padding:7px 10px;
+                border-radius:7px;
+                cursor:pointer;
+                font-size:12px;
+              "
+            >
+              ${activo ? 'Desactivar' : 'Activar'}
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+    `;
+  });
+
+
+  /*
+   * Si no existen proveedores
+   */
+  if (!filas) {
+
+    filas = `
+      <tr>
+        <td
+          colspan="8"
+          style="
+            padding:30px;
+            text-align:center;
+            color:var(--color-text-secondary);
+          "
+        >
+          No hay proveedores registrados.
+        </td>
+      </tr>
+    `;
+  }
+
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+        <h1>Proveedores</h1>
+
+        <p>
+          Gestionar proveedores del sistema
+        </p>
+      </div>
+
+      <div>
+        <button
+          type="button"
+          id="btnNuevoProveedor"
+          style="
+            border:none;
+            background:var(--color-primary);
+            color:white;
+            padding:10px 16px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:13px;
+            font-weight:600;
+          "
+        >
+          + Nuevo proveedor
+        </button>
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Listado de proveedores</h2>
+
+          <p>
+            Consulte y administre los proveedores registrados.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <div style="
+          display:grid;
+          grid-template-columns:2fr 1fr;
+          gap:12px;
+          margin-bottom:18px;
+        ">
+
+          <input
+            type="text"
+            id="buscarProveedor"
+            placeholder="Buscar por nombre, documento, teléfono o correo..."
+            style="
+              width:100%;
+              padding:10px 12px;
+              border:1px solid var(--color-border);
+              border-radius:8px;
+              font-size:13px;
+            "
+          >
+
+          <select
+            id="filtroEstadoProveedor"
+            style="
+              width:100%;
+              padding:10px 12px;
+              border:1px solid var(--color-border);
+              border-radius:8px;
+              font-size:13px;
+              background:white;
+            "
+          >
+
+            <option value="todos">
+              Todos
+            </option>
+
+            <option value="activos">
+              Activos
+            </option>
+
+            <option value="inactivos">
+              Inactivos
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div style="
+          overflow-x:auto;
+        ">
+
+          <table
+            id="tablaProveedores"
+            style="
+              width:100%;
+              border-collapse:collapse;
+              font-size:13px;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  ID
+                </th>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Nombre
+                </th>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Documento
+                </th>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Teléfono
+                </th>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Email
+                </th>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Dirección
+                </th>
+
+                <th style="
+                  text-align:center;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Estado
+                </th>
+
+                <th style="
+                  text-align:center;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Acciones
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+              ${filas}
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  /*
+   * Nuevo proveedor
+   */
+  const btnNuevoProveedor =
+    document.getElementById('btnNuevoProveedor');
+
+  if (btnNuevoProveedor) {
+
+    btnNuevoProveedor.addEventListener(
+      'click',
+      mostrarFormularioNuevoProveedor
+    );
+
+  }
+
+
+  /*
+   * Editar proveedor
+   */
+  document
+    .querySelectorAll('.btn-editar-proveedor')
+    .forEach(function(boton) {
+
+      boton.addEventListener(
+        'click',
+        function() {
+
+          const idProveedor =
+            Number(
+              boton.getAttribute('data-id')
+            );
+
+          mostrarFormularioEditarProveedor(
+            idProveedor
+          );
+
+        }
+      );
+
+    });
+
+
+  /*
+   * Activar / desactivar
+   */
+  document
+    .querySelectorAll('.btn-estado-proveedor')
+    .forEach(function(boton) {
+
+      boton.addEventListener(
+        'click',
+        function() {
+
+          const idProveedor =
+            Number(
+              boton.getAttribute('data-id')
+            );
+
+          const activo =
+            boton.getAttribute('data-activo') === 'true';
+
+          cambiarEstadoProveedorFrontend(
+            idProveedor,
+            !activo
+          );
+
+        }
+      );
+
+    });
+
+
+  /*
+   * Búsqueda
+   */
+  const buscarProveedor =
+    document.getElementById('buscarProveedor');
+
+  const filtroEstadoProveedor =
+    document.getElementById(
+      'filtroEstadoProveedor'
+    );
+
+
+  if (buscarProveedor) {
+
+    buscarProveedor.addEventListener(
+      'input',
+      aplicarFiltrosProveedores
+    );
+
+  }
+
+
+  if (filtroEstadoProveedor) {
+
+    filtroEstadoProveedor.addEventListener(
+      'change',
+      aplicarFiltrosProveedores
+    );
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Filtros
+ * ------------------------------------------------------------
+ */
+function aplicarFiltrosProveedores() {
+
+  const campoBusqueda =
+    document.getElementById(
+      'buscarProveedor'
+    );
+
+  const selectorEstado =
+    document.getElementById(
+      'filtroEstadoProveedor'
+    );
+
+  if (!campoBusqueda || !selectorEstado) {
+    return;
+  }
+
+
+  const texto =
+    campoBusqueda.value
+      .trim()
+      .toLowerCase();
+
+  const estado =
+    selectorEstado.value;
+
+
+  const filas =
+    document.querySelectorAll(
+      '#tablaProveedores tbody tr'
+    );
+
+
+  filas.forEach(function(fila) {
+
+    const textoFila =
+      fila.textContent.toLowerCase();
+
+    const coincideBusqueda =
+      !texto ||
+      textoFila.includes(texto);
+
+    const activo =
+      fila.getAttribute(
+        'data-activo'
+      ) === 'true';
+
+
+    let coincideEstado = true;
+
+
+    if (estado === 'activos') {
+      coincideEstado = activo;
+    }
+
+
+    if (estado === 'inactivos') {
+      coincideEstado = !activo;
+    }
+
+
+    fila.style.display =
+      coincideBusqueda &&
+      coincideEstado
+        ? ''
+        : 'none';
+
+  });
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Formulario nuevo proveedor
+ * ------------------------------------------------------------
+ */
+function mostrarFormularioNuevoProveedor() {
+
+  const contenedor =
+    document.getElementById(
+      'vista-proveedores'
+    );
+
+  if (!contenedor) {
+    return;
+  }
+
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+
+        <h1>Nuevo proveedor</h1>
+
+        <p>
+          Registrar un nuevo proveedor
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>Datos del proveedor</h2>
+
+          <p>
+            Complete la información requerida.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <form id="formNuevoProveedor">
+
+          <div style="
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:18px;
+          ">
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Nombre *
+              </label>
+
+              <input
+                type="text"
+                id="proveedorNombre"
+                required
+                maxlength="150"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Documento
+              </label>
+
+              <input
+                type="text"
+                id="proveedorDocumento"
+                maxlength="30"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Teléfono
+              </label>
+
+              <input
+                type="text"
+                id="proveedorTelefono"
+                maxlength="30"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Email
+              </label>
+
+              <input
+                type="email"
+                id="proveedorEmail"
+                maxlength="150"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div style="
+              grid-column:1 / -1;
+            ">
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Dirección
+              </label>
+
+              <textarea
+                id="proveedorDireccion"
+                maxlength="250"
+                rows="3"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                  resize:vertical;
+                "
+              ></textarea>
+
+            </div>
+
+
+          </div>
+
+
+          <div style="
+            margin-top:20px;
+            padding:14px;
+            background:var(--color-background);
+            border-radius:8px;
+          ">
+
+            <label style="
+              display:flex;
+              align-items:center;
+              gap:8px;
+              font-size:13px;
+              cursor:pointer;
+            ">
+
+              <input
+                type="checkbox"
+                id="proveedorActivo"
+                checked
+              >
+
+              Proveedor activo
+
+            </label>
+
+          </div>
+
+
+          <div style="
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:22px;
+          ">
+
+            <button
+              type="button"
+              id="btnCancelarProveedor"
+              style="
+                border:1px solid var(--color-border);
+                background:white;
+                color:var(--color-text);
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+              "
+            >
+              Cancelar
+            </button>
+
+
+            <button
+              type="submit"
+              style="
+                border:none;
+                background:var(--color-primary);
+                color:white;
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+                font-weight:600;
+              "
+            >
+              Guardar proveedor
+            </button>
+
+          </div>
+
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+
+  document
+    .getElementById('btnCancelarProveedor')
+    .addEventListener(
+      'click',
+      function() {
+        cargarProveedores();
+      }
+    );
+
+
+  document
+    .getElementById('formNuevoProveedor')
+    .addEventListener(
+      'submit',
+      guardarNuevoProveedor
+    );
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Guardar nuevo proveedor
+ * ------------------------------------------------------------
+ */
+async function guardarNuevoProveedor(evento) {
+
+  evento.preventDefault();
+
+
+  const boton =
+    document.querySelector(
+      '#formNuevoProveedor button[type="submit"]'
+    );
+
+
+  if (boton) {
+
+    boton.disabled = true;
+    boton.textContent = 'Guardando...';
+
+  }
+
+
+  try {
+
+    const nombre =
+      document
+        .getElementById(
+          'proveedorNombre'
+        )
+        .value
+        .trim();
+
+
+    const documento =
+      document
+        .getElementById(
+          'proveedorDocumento'
+        )
+        .value
+        .trim();
+
+
+    const telefono =
+      document
+        .getElementById(
+          'proveedorTelefono'
+        )
+        .value
+        .trim();
+
+
+    const email =
+      document
+        .getElementById(
+          'proveedorEmail'
+        )
+        .value
+        .trim();
+
+
+    const direccion =
+      document
+        .getElementById(
+          'proveedorDireccion'
+        )
+        .value
+        .trim();
+
+
+    const activo =
+      document
+        .getElementById(
+          'proveedorActivo'
+        )
+        .checked;
+
+
+    if (!nombre) {
+
+      throw new Error(
+        'El nombre del proveedor es obligatorio.'
+      );
+
+    }
+
+
+    const respuesta =
+      await apiPost({
+
+        accion:
+          'crearProveedor',
+
+        datos: {
+
+          nombre:
+            nombre,
+
+          documento:
+            documento,
+
+          telefono:
+            telefono,
+
+          email:
+            email,
+
+          direccion:
+            direccion,
+
+          activo:
+            activo
+
+        }
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo crear el proveedor.'
+      );
+
+    }
+
+
+    alert(
+      respuesta.mensaje ||
+      'Proveedor creado correctamente.'
+    );
+
+
+    cargarProveedores();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al crear proveedor:',
+      error
+    );
+
+
+    alert(
+      'No se pudo crear el proveedor.\n\n' +
+      error.message
+    );
+
+
+  } finally {
+
+    if (boton) {
+
+      boton.disabled = false;
+      boton.textContent =
+        'Guardar proveedor';
+
+    }
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Formulario editar proveedor
+ * ------------------------------------------------------------
+ */
+function mostrarFormularioEditarProveedor(
+  idProveedor
+) {
+
+  const contenedor =
+    document.getElementById(
+      'vista-proveedores'
+    );
+
+  if (!contenedor) {
+    return;
+  }
+
+
+  contenedor.innerHTML = `
+    <div class="panel">
+      <div class="panel-body">
+        <p>Cargando proveedor...</p>
+      </div>
+    </div>
+  `;
+
+
+  cargarProveedorParaEditar(
+    idProveedor
+  );
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Cargar proveedor para edición
+ * ------------------------------------------------------------
+ */
+async function cargarProveedorParaEditar(
+  idProveedor
+) {
+
+  const contenedor =
+    document.getElementById(
+      'vista-proveedores'
+    );
+
+
+  try {
+
+    /*
+     * Utilizamos el endpoint existente
+     * de proveedor por ID.
+     */
+    const respuesta =
+      await apiGet({
+
+        accion:
+          'proveedor',
+
+        idProveedor:
+          idProveedor
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo obtener el proveedor.'
+      );
+
+    }
+
+
+    const proveedor =
+      respuesta.datos;
+
+
+    if (!proveedor) {
+
+      throw new Error(
+        'No se encontró el proveedor.'
+      );
+
+    }
+
+
+    mostrarFormularioEditarProveedorDatos(
+      proveedor
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar proveedor:',
+      error
+    );
+
+
+    contenedor.innerHTML = `
+
+      <div class="panel">
+
+        <div class="panel-body">
+
+          <div class="estado-inicial">
+
+            <div class="estado-icono">
+              !
+            </div>
+
+            <div>
+
+              <h3>
+                Error al cargar proveedor
+              </h3>
+
+              <p>
+                ${error.message}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Mostrar formulario de edición
+ * ------------------------------------------------------------
+ */
+function mostrarFormularioEditarProveedorDatos(
+  proveedor
+) {
+
+  const contenedor =
+    document.getElementById(
+      'vista-proveedores'
+    );
+
+
+  if (!contenedor) {
+    return;
+  }
+
+
+  const idProveedor =
+    proveedor.ID_PROVEEDOR ||
+    proveedor.idProveedor;
+
+
+  const nombre =
+    proveedor.NOMBRE ||
+    proveedor.nombre ||
+    '';
+
+
+  const documento =
+    proveedor.DOCUMENTO ||
+    proveedor.documento ||
+    '';
+
+
+  const telefono =
+    proveedor.TELEFONO ||
+    proveedor.telefono ||
+    '';
+
+
+  const email =
+    proveedor.EMAIL ||
+    proveedor.email ||
+    '';
+
+
+  const direccion =
+    proveedor.DIRECCION ||
+    proveedor.direccion ||
+    '';
+
+
+  const activo =
+    proveedor.ACTIVO === true ||
+    proveedor.ACTIVO === 'TRUE' ||
+    proveedor.ACTIVO === 1 ||
+    proveedor.ACTIVO === '1' ||
+    proveedor.activo === true;
+
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+
+        <h1>Editar proveedor</h1>
+
+        <p>
+          Modificar la información del proveedor
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>Datos del proveedor</h2>
+
+          <p>
+            Modifique la información que desea actualizar.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <form id="formEditarProveedor">
+
+          <div style="
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:18px;
+          ">
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Nombre *
+              </label>
+
+              <input
+                type="text"
+                id="editarProveedorNombre"
+                value="${nombre}"
+                required
+                maxlength="150"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Documento
+              </label>
+
+              <input
+                type="text"
+                id="editarProveedorDocumento"
+                value="${documento}"
+                maxlength="30"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Teléfono
+              </label>
+
+              <input
+                type="text"
+                id="editarProveedorTelefono"
+                value="${telefono}"
+                maxlength="30"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Email
+              </label>
+
+              <input
+                type="email"
+                id="editarProveedorEmail"
+                value="${email}"
+                maxlength="150"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div style="
+              grid-column:1 / -1;
+            ">
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Dirección
+              </label>
+
+              <textarea
+                id="editarProveedorDireccion"
+                maxlength="250"
+                rows="3"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                  resize:vertical;
+                "
+              >${direccion}</textarea>
+
+            </div>
+
+
+          </div>
+
+
+          <div style="
+            margin-top:20px;
+            padding:14px;
+            background:var(--color-background);
+            border-radius:8px;
+          ">
+
+            <label style="
+              display:flex;
+              align-items:center;
+              gap:8px;
+              font-size:13px;
+              cursor:pointer;
+            ">
+
+              <input
+                type="checkbox"
+                id="editarProveedorActivo"
+                ${activo ? 'checked' : ''}
+              >
+
+              Proveedor activo
+
+            </label>
+
+          </div>
+
+
+          <div style="
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:22px;
+          ">
+
+            <button
+              type="button"
+              id="btnCancelarEdicionProveedor"
+              style="
+                border:1px solid var(--color-border);
+                background:white;
+                color:var(--color-text);
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+              "
+            >
+              Cancelar
+            </button>
+
+
+            <button
+              type="submit"
+              style="
+                border:none;
+                background:var(--color-primary);
+                color:white;
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+                font-weight:600;
+              "
+            >
+              Guardar cambios
+            </button>
+
+          </div>
+
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+
+  document
+    .getElementById(
+      'btnCancelarEdicionProveedor'
+    )
+    .addEventListener(
+      'click',
+      function() {
+
+        cargarProveedores();
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      'formEditarProveedor'
+    )
+    .addEventListener(
+      'submit',
+      function(evento) {
+
+        guardarEdicionProveedor(
+          evento,
+          idProveedor
+        );
+
+      }
+    );
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Guardar edición
+ * ------------------------------------------------------------
+ */
+async function guardarEdicionProveedor(
+  evento,
+  idProveedor
+) {
+
+  evento.preventDefault();
+
+
+  const boton =
+    document.querySelector(
+      '#formEditarProveedor button[type="submit"]'
+    );
+
+
+  if (boton) {
+
+    boton.disabled = true;
+    boton.textContent = 'Guardando...';
+
+  }
+
+
+  try {
+
+    const nombre =
+      document
+        .getElementById(
+          'editarProveedorNombre'
+        )
+        .value
+        .trim();
+
+
+    const documento =
+      document
+        .getElementById(
+          'editarProveedorDocumento'
+        )
+        .value
+        .trim();
+
+
+    const telefono =
+      document
+        .getElementById(
+          'editarProveedorTelefono'
+        )
+        .value
+        .trim();
+
+
+    const email =
+      document
+        .getElementById(
+          'editarProveedorEmail'
+        )
+        .value
+        .trim();
+
+
+    const direccion =
+      document
+        .getElementById(
+          'editarProveedorDireccion'
+        )
+        .value
+        .trim();
+
+
+    const activo =
+      document
+        .getElementById(
+          'editarProveedorActivo'
+        )
+        .checked;
+
+
+    if (!nombre) {
+
+      throw new Error(
+        'El nombre del proveedor es obligatorio.'
+      );
+
+    }
+
+
+    const respuesta =
+      await apiPost({
+
+        accion:
+          'editarProveedor',
+
+        idProveedor:
+          Number(idProveedor),
+
+        datos: {
+
+          nombre:
+            nombre,
+
+          documento:
+            documento,
+
+          telefono:
+            telefono,
+
+          email:
+            email,
+
+          direccion:
+            direccion,
+
+          activo:
+            activo
+
+        }
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo actualizar el proveedor.'
+      );
+
+    }
+
+
+    alert(
+      respuesta.mensaje ||
+      'Proveedor actualizado correctamente.'
+    );
+
+
+    cargarProveedores();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al editar proveedor:',
+      error
+    );
+
+
+    alert(
+      'No se pudo actualizar el proveedor.\n\n' +
+      error.message
+    );
+
+
+  } finally {
+
+    if (boton) {
+
+      boton.disabled = false;
+      boton.textContent =
+        'Guardar cambios';
+
+    }
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Activar / desactivar
+ * ------------------------------------------------------------
+ */
+async function cambiarEstadoProveedorFrontend(
+  idProveedor,
+  nuevoEstado
+) {
+
+  const accionTexto =
+    nuevoEstado
+      ? 'activar'
+      : 'desactivar';
+
+
+  const confirmar =
+    confirm(
+      '¿Está seguro de que desea ' +
+      accionTexto +
+      ' este proveedor?'
+    );
+
+
+  if (!confirmar) {
+    return;
+  }
+
+
+  try {
+
+    const respuesta =
+      await apiPost({
+
+        accion:
+          'cambiarEstadoProveedor',
+
+        idProveedor:
+          Number(idProveedor),
+
+        activo:
+          nuevoEstado
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo cambiar el estado del proveedor.'
+      );
+
+    }
+
+
+    alert(
+      respuesta.mensaje ||
+      'Estado actualizado correctamente.'
+    );
+
+
+    cargarProveedores();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al cambiar estado del proveedor:',
+      error
+    );
+
+
+    alert(
+      'No se pudo cambiar el estado del proveedor.\n\n' +
+      error.message
+    );
+
+  }
+
+}  
   
   /*
    * Eventos del menú
