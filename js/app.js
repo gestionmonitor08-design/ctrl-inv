@@ -77,6 +77,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nombreVista === 'proveedores') {
       cargarProveedores();
     }    
+
+    if (nombreVista === 'clientes') {
+      cargarClientes();
+    }
+    
   }
 
 
@@ -5163,6 +5168,279 @@ async function cambiarEstadoProveedorFrontend(
   }
 
 }  
+
+/*
+ * ------------------------------------------------------------
+ * Cargar clientes
+ * ------------------------------------------------------------
+ */
+  async function cargarClientes() {
+  
+    const contenedor =
+      document.getElementById('vista-clientes');
+  
+    if (!contenedor) {
+      return;
+    }
+  
+    contenedor.innerHTML = `
+      <div class="panel">
+        <div class="panel-body">
+          <p>Cargando clientes...</p>
+        </div>
+      </div>
+    `;
+  
+    try {
+  
+      const respuesta =
+        await apiGet({
+          accion: 'clientes'
+        });
+  
+      if (!respuesta.ok) {
+        throw new Error(
+          respuesta.mensaje ||
+          'No se pudieron cargar los clientes.'
+        );
+      }
+  
+      mostrarClientes(respuesta.datos);
+  
+    } catch (error) {
+  
+      console.error(
+        'Error al cargar clientes:',
+        error
+      );
+  
+      contenedor.innerHTML = `
+        <div class="panel">
+          <div class="panel-body">
+  
+            <div class="estado-inicial">
+  
+              <div class="estado-icono">
+                !
+              </div>
+  
+              <div>
+                <h3>Error al cargar clientes</h3>
+                <p>${error.message}</p>
+              </div>
+  
+            </div>
+  
+          </div>
+        </div>
+      `;
+    }
+  }
+
+/*
+ * ------------------------------------------------------------
+ * Mostrar clientes
+ * ------------------------------------------------------------
+ */
+function mostrarClientes(clientes) {
+  
+    const contenedor =
+      document.getElementById('vista-clientes');
+  
+    if (!contenedor) {
+      return;
+    }
+  
+    if (!Array.isArray(clientes)) {
+      clientes = [];
+    }
+  
+    let filas = '';
+  
+    clientes.forEach(function(cliente) {
+  
+      const activo =
+        cliente.ACTIVO === true ||
+        cliente.ACTIVO === 'TRUE' ||
+        cliente.ACTIVO === 1 ||
+        cliente.ACTIVO === '1';
+  
+      filas += `
+        <tr
+          data-activo="${activo ? 'true' : 'false'}"
+          style="
+            border-bottom:1px solid var(--color-border);
+          "
+        >
+  
+          <td style="
+            padding:12px;
+            border-bottom:1px solid var(--color-border);
+          ">
+            ${cliente.ID_CLIENTE}
+          </td>
+  
+          <td style="
+            padding:12px;
+            border-bottom:1px solid var(--color-border);
+          ">
+            ${cliente.NOMBRE || ''}
+          </td>
+  
+          <td style="
+            padding:12px;
+            border-bottom:1px solid var(--color-border);
+          ">
+            ${cliente.COMPAÑIA || ''}
+          </td>
+  
+          <td style="
+            padding:12px;
+            border-bottom:1px solid var(--color-border);
+          ">
+            ${cliente.DOCUMENTO || ''}
+          </td>
+  
+          <td style="
+            padding:12px;
+            border-bottom:1px solid var(--color-border);
+          ">
+            ${cliente.TELEFONO || ''}
+          </td>
+  
+          <td style="
+            padding:12px;
+            border-bottom:1px solid var(--color-border);
+          ">
+            ${cliente.EMAIL || ''}
+          </td>
+  
+          <td style="
+            padding:12px;
+            text-align:center;
+            border-bottom:1px solid var(--color-border);
+          ">
+  
+            <span
+              style="
+                display:inline-block;
+                padding:4px 9px;
+                border-radius:12px;
+                font-size:11px;
+                font-weight:600;
+                background:${
+                  activo
+                    ? 'var(--color-success-light, #dcfce7)'
+                    : 'var(--color-danger-light, #fee2e2)'
+                };
+                color:${
+                  activo
+                    ? 'var(--color-success, #166534)'
+                    : 'var(--color-danger, #991b1b)'
+                };
+              "
+            >
+              ${activo ? 'Activo' : 'Inactivo'}
+            </span>
+  
+          </td>
+  
+          <td style="
+            padding:12px;
+            text-align:center;
+            border-bottom:1px solid var(--color-border);
+          ">
+  
+            <div style="
+              display:flex;
+              justify-content:center;
+              gap:6px;
+              flex-wrap:wrap;
+            ">
+  
+              <button
+                type="button"
+                class="btn-editar-cliente"
+                data-id="${cliente.ID_CLIENTE}"
+                style="
+                  border:1px solid var(--color-border);
+                  background:white;
+                  padding:7px 10px;
+                  border-radius:7px;
+                  cursor:pointer;
+                  font-size:12px;
+                "
+              >
+                Editar
+              </button>
+  
+              <button
+                type="button"
+                class="btn-estado-cliente"
+                data-id="${cliente.ID_CLIENTE}"
+                data-activo="${activo ? 'true' : 'false'}"
+                style="
+                  border:none;
+                  background:var(--color-primary);
+                  color:white;
+                  padding:7px 10px;
+                  border-radius:7px;
+                  cursor:pointer;
+                  font-size:12px;
+                "
+              >
+                ${activo ? 'Desactivar' : 'Activar'}
+              </button>
+  
+            </div>
+  
+          </td>
+  
+        </tr>
+      `;
+    });
+  
+    /*
+     * Si no existen clientes
+     */
+    if (!filas) {
+  
+      filas = `
+        <tr>
+          <td
+            colspan="8"
+            style="
+              padding:30px;
+              text-align:center;
+              color:var(--color-text-secondary);
+            "
+          >
+            No hay clientes registrados.
+          </td>
+        </tr>
+      `;
+    }
+  
+    /*
+     * Construir tabla
+     */
+    const tabla =
+      document.getElementById('tablaClientes');
+  
+    if (!tabla) {
+      return;
+    }
+  
+    const tbody =
+      tabla.querySelector('tbody');
+  
+    if (!tbody) {
+      return;
+    }
+  
+    tbody.innerHTML = filas;
+  }
+
   
   /*
    * Eventos del menú
