@@ -5174,70 +5174,65 @@ async function cambiarEstadoProveedorFrontend(
  * Cargar clientes
  * ------------------------------------------------------------
  */
-  async function cargarClientes() {
-  
-    const contenedor =
-      document.getElementById('vista-clientes');
-  
-    if (!contenedor) {
-      return;
+async function cargarClientes() {
+
+  const contenedor =
+    document.getElementById('vista-clientes');
+
+  if (!contenedor) {
+    return;
+  }
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'clientes'
+      });
+
+    console.log(
+      'CLIENTES: respuesta recibida',
+      respuesta
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudieron cargar los clientes.'
+      );
     }
-  
+
+    mostrarClientes(respuesta.datos);
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar clientes:',
+      error
+    );
+
     contenedor.innerHTML = `
       <div class="panel">
         <div class="panel-body">
-          <p>Cargando clientes...</p>
+
+          <div class="estado-inicial">
+
+            <div class="estado-icono">
+              !
+            </div>
+
+            <div>
+              <h3>Error al cargar clientes</h3>
+              <p>${error.message}</p>
+            </div>
+
+          </div>
+
         </div>
       </div>
     `;
-  
-    try {
-
-      console.log('CLIENTES: antes de apiGet');
-      const respuesta =
-        await apiGet({
-          accion: 'clientes'
-        });
-      console.log('CLIENTES: respuesta recibida', respuesta);
-      
-      if (!respuesta.ok) {
-        throw new Error(
-          respuesta.mensaje ||
-          'No se pudieron cargar los clientes.'
-        );
-      }
-  
-      mostrarClientes(respuesta.datos);
-  
-    } catch (error) {
-  
-      console.error(
-        'Error al cargar clientes:',
-        error
-      );
-  
-      contenedor.innerHTML = `
-        <div class="panel">
-          <div class="panel-body">
-  
-            <div class="estado-inicial">
-  
-              <div class="estado-icono">
-                !
-              </div>
-  
-              <div>
-                <h3>Error al cargar clientes</h3>
-                <p>${error.message}</p>
-              </div>
-  
-            </div>
-  
-          </div>
-        </div>
-      `;
-    }
   }
+}
 
 /*
  * ------------------------------------------------------------
