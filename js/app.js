@@ -69,6 +69,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nombreVista === 'productos') {
       cargarProductos();
     }
+    if (nombreVista === 'categorias') {
+      cargarCategorias();
+    }  
   }
 
 
@@ -1776,6 +1779,1509 @@ function mostrarFormularioEditarProductoDatos(producto) {
   
   }
 
+/*
+ * ============================================================
+ * MÓDULO: CATEGORÍAS
+ * ============================================================
+ */
+
+
+/*
+ * ------------------------------------------------------------
+ * Cargar categorías
+ * ------------------------------------------------------------
+ */
+async function cargarCategorias() {
+
+  const contenedor =
+    document.getElementById('vista-categorias');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="panel">
+      <div class="panel-body">
+        <p>Cargando categorías...</p>
+      </div>
+    </div>
+  `;
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'categorias'
+      });
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudieron cargar las categorías.'
+      );
+
+    }
+
+    mostrarCategorias(respuesta.datos);
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar categorías:',
+      error
+    );
+
+    contenedor.innerHTML = `
+      <div class="panel">
+        <div class="panel-body">
+
+          <div class="estado-inicial">
+
+            <div class="estado-icono">
+              !
+            </div>
+
+            <div>
+              <h3>Error al cargar categorías</h3>
+              <p>${error.message}</p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Mostrar categorías
+ * ------------------------------------------------------------
+ */
+function mostrarCategorias(categorias) {
+
+  const contenedor =
+    document.getElementById('vista-categorias');
+
+  if (!contenedor) {
+    return;
+  }
+
+  if (!Array.isArray(categorias)) {
+    categorias = [];
+  }
+
+  let filas = '';
+
+  categorias.forEach(function(categoria) {
+
+    const activo =
+      categoria.ACTIVO === true ||
+      categoria.ACTIVO === 'TRUE' ||
+      categoria.ACTIVO === 1 ||
+      categoria.ACTIVO === '1';
+
+    filas += `
+      <tr
+        data-activo="${activo ? 'true' : 'false'}"
+        style="
+          border-bottom:1px solid var(--color-border);
+        "
+      >
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${categoria.ID_CATEGORIA}
+        </td>
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${categoria.NOMBRE}
+        </td>
+
+        <td style="
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          ${categoria.DESCRIPCION || ''}
+        </td>
+
+        <td style="
+          text-align:center;
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+        ">
+          <span style="
+            display:inline-block;
+            padding:4px 9px;
+            border-radius:12px;
+            font-size:11px;
+            font-weight:600;
+            background:${activo ? '#e8f5e9' : '#ffebee'};
+            color:${activo
+              ? 'var(--color-success)'
+              : 'var(--color-danger)'};
+          ">
+            ${activo ? 'Activo' : 'Inactivo'}
+          </span>
+        </td>
+
+        <td style="
+          text-align:center;
+          padding:12px;
+          border-bottom:1px solid var(--color-border);
+          white-space:nowrap;
+        ">
+
+          <button
+            class="btn-editar-categoria"
+            data-id="${categoria.ID_CATEGORIA}"
+            style="
+              border:1px solid var(--color-border);
+              background:white;
+              color:var(--color-primary);
+              padding:7px 12px;
+              border-radius:7px;
+              cursor:pointer;
+              font-size:12px;
+              font-weight:600;
+              margin-right:5px;
+            "
+          >
+            Editar
+          </button>
+
+          <button
+            class="btn-estado-categoria"
+            data-id="${categoria.ID_CATEGORIA}"
+            data-activo="${activo ? 'true' : 'false'}"
+            style="
+              border:1px solid var(--color-border);
+              background:white;
+              color:${activo
+                ? 'var(--color-danger)'
+                : 'var(--color-success)'};
+              padding:7px 12px;
+              border-radius:7px;
+              cursor:pointer;
+              font-size:12px;
+              font-weight:600;
+            "
+          >
+            ${activo ? 'Desactivar' : 'Activar'}
+          </button>
+
+        </td>
+
+      </tr>
+    `;
+  });
+
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+        <h1>Categorías</h1>
+
+        <p>
+          Administración de categorías de productos
+        </p>
+      </div>
+
+      <div>
+
+        <button
+          id="btnNuevaCategoria"
+          style="
+            border:none;
+            background:var(--color-primary);
+            color:white;
+            padding:11px 18px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:13px;
+            font-weight:600;
+          "
+        >
+          + Nueva categoría
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>Categorías registradas</h2>
+
+          <p>
+            Administre las categorías disponibles
+            para sus productos.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:minmax(250px,1fr) 180px;
+          gap:12px;
+          margin-bottom:18px;
+        "
+      >
+
+        <input
+          type="text"
+          id="buscarCategoria"
+          placeholder="Buscar por nombre o descripción..."
+          style="
+            width:100%;
+            padding:10px 12px;
+            border:1px solid var(--color-border);
+            border-radius:8px;
+            font-size:13px;
+          "
+        >
+
+        <select
+          id="filtroEstadoCategoria"
+          style="
+            width:100%;
+            padding:10px 12px;
+            border:1px solid var(--color-border);
+            border-radius:8px;
+            font-size:13px;
+            background:white;
+          "
+        >
+
+          <option value="todos">
+            Todos
+          </option>
+
+          <option value="activos">
+            Activos
+          </option>
+
+          <option value="inactivos">
+            Inactivos
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <div style="overflow-x:auto;">
+
+          <table
+            id="tablaCategorias"
+            style="
+              width:100%;
+              border-collapse:collapse;
+              font-size:13px;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  ID
+                </th>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Nombre
+                </th>
+
+                <th style="
+                  text-align:left;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Descripción
+                </th>
+
+                <th style="
+                  text-align:center;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Estado
+                </th>
+
+                <th style="
+                  text-align:center;
+                  padding:12px;
+                  border-bottom:1px solid var(--color-border);
+                ">
+                  Acciones
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              ${filas}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  /*
+   * Nuevo
+   */
+  const btnNuevaCategoria =
+    document.getElementById('btnNuevaCategoria');
+
+  if (btnNuevaCategoria) {
+
+    btnNuevaCategoria.addEventListener(
+      'click',
+      mostrarFormularioNuevaCategoria
+    );
+
+  }
+
+
+  /*
+   * Editar
+   */
+  document
+    .querySelectorAll('.btn-editar-categoria')
+    .forEach(function(boton) {
+
+      boton.addEventListener(
+        'click',
+        function() {
+
+          const idCategoria =
+            Number(
+              boton.getAttribute('data-id')
+            );
+
+          mostrarFormularioEditarCategoria(
+            idCategoria
+          );
+
+        }
+      );
+
+    });
+
+
+  /*
+   * Estado
+   */
+  document
+    .querySelectorAll('.btn-estado-categoria')
+    .forEach(function(boton) {
+
+      boton.addEventListener(
+        'click',
+        function() {
+
+          const idCategoria =
+            Number(
+              boton.getAttribute('data-id')
+            );
+
+          const activo =
+            boton.getAttribute('data-activo') === 'true';
+
+          cambiarEstadoCategoriaFrontend(
+            idCategoria,
+            !activo
+          );
+
+        }
+      );
+
+    });
+
+
+  /*
+   * Búsqueda
+   */
+  const buscarCategoria =
+    document.getElementById('buscarCategoria');
+
+  const filtroEstadoCategoria =
+    document.getElementById(
+      'filtroEstadoCategoria'
+    );
+
+
+  if (buscarCategoria) {
+
+    buscarCategoria.addEventListener(
+      'input',
+      aplicarFiltrosCategorias
+    );
+
+  }
+
+
+  if (filtroEstadoCategoria) {
+
+    filtroEstadoCategoria.addEventListener(
+      'change',
+      aplicarFiltrosCategorias
+    );
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Filtros
+ * ------------------------------------------------------------
+ */
+function aplicarFiltrosCategorias() {
+
+  const campoBusqueda =
+    document.getElementById(
+      'buscarCategoria'
+    );
+
+  const selectorEstado =
+    document.getElementById(
+      'filtroEstadoCategoria'
+    );
+
+  if (!campoBusqueda || !selectorEstado) {
+    return;
+  }
+
+  const texto =
+    campoBusqueda.value
+      .trim()
+      .toLowerCase();
+
+  const estado =
+    selectorEstado.value;
+
+  const filas =
+    document.querySelectorAll(
+      '#tablaCategorias tbody tr'
+    );
+
+  filas.forEach(function(fila) {
+
+    const textoFila =
+      fila.textContent.toLowerCase();
+
+    const coincideBusqueda =
+      !texto ||
+      textoFila.includes(texto);
+
+    const activo =
+      fila.getAttribute(
+        'data-activo'
+      ) === 'true';
+
+    let coincideEstado = true;
+
+    if (estado === 'activos') {
+      coincideEstado = activo;
+    }
+
+    if (estado === 'inactivos') {
+      coincideEstado = !activo;
+    }
+
+    fila.style.display =
+      coincideBusqueda && coincideEstado
+        ? ''
+        : 'none';
+
+  });
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Formulario nueva categoría
+ * ------------------------------------------------------------
+ */
+function mostrarFormularioNuevaCategoria() {
+
+  const contenedor =
+    document.getElementById(
+      'vista-categorias'
+    );
+
+  if (!contenedor) {
+    return;
+  }
+
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+
+        <h1>Nueva categoría</h1>
+
+        <p>
+          Registrar una nueva categoría
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>Datos de la categoría</h2>
+
+          <p>
+            Complete la información requerida.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <form id="formNuevaCategoria">
+
+
+          <div style="
+            display:grid;
+            grid-template-columns:1fr;
+            gap:18px;
+          ">
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Nombre *
+              </label>
+
+              <input
+                type="text"
+                id="categoriaNombre"
+                required
+                maxlength="100"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Descripción
+              </label>
+
+              <textarea
+                id="categoriaDescripcion"
+                maxlength="250"
+                rows="4"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                  resize:vertical;
+                "
+              ></textarea>
+
+            </div>
+
+
+          </div>
+
+
+          <div style="
+            margin-top:20px;
+            padding:14px;
+            background:var(--color-background);
+            border-radius:8px;
+          ">
+
+            <label style="
+              display:flex;
+              align-items:center;
+              gap:8px;
+              font-size:13px;
+              cursor:pointer;
+            ">
+
+              <input
+                type="checkbox"
+                id="categoriaActivo"
+                checked
+              >
+
+              Categoría activa
+
+            </label>
+
+          </div>
+
+
+          <div style="
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:22px;
+          ">
+
+            <button
+              type="button"
+              id="btnCancelarNuevaCategoria"
+              style="
+                border:1px solid var(--color-border);
+                background:white;
+                color:var(--color-text);
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+              "
+            >
+              Cancelar
+            </button>
+
+
+            <button
+              type="submit"
+              style="
+                border:none;
+                background:var(--color-primary);
+                color:white;
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+                font-weight:600;
+              "
+            >
+              Guardar categoría
+            </button>
+
+          </div>
+
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+
+  document
+    .getElementById(
+      'btnCancelarNuevaCategoria'
+    )
+    .addEventListener(
+      'click',
+      cargarCategorias
+    );
+
+
+  document
+    .getElementById(
+      'formNuevaCategoria'
+    )
+    .addEventListener(
+      'submit',
+      guardarNuevaCategoria
+    );
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Guardar nueva categoría
+ * ------------------------------------------------------------
+ */
+async function guardarNuevaCategoria(evento) {
+
+  evento.preventDefault();
+
+  const boton =
+    document.querySelector(
+      '#formNuevaCategoria button[type="submit"]'
+    );
+
+  if (boton) {
+
+    boton.disabled = true;
+    boton.textContent = 'Guardando...';
+
+  }
+
+
+  try {
+
+    const nombre =
+      document
+        .getElementById(
+          'categoriaNombre'
+        )
+        .value
+        .trim();
+
+    const descripcion =
+      document
+        .getElementById(
+          'categoriaDescripcion'
+        )
+        .value
+        .trim();
+
+    const activo =
+      document
+        .getElementById(
+          'categoriaActivo'
+        )
+        .checked;
+
+
+    if (!nombre) {
+
+      throw new Error(
+        'El nombre de la categoría es obligatorio.'
+      );
+
+    }
+
+
+    const respuesta =
+      await apiPost({
+
+        accion: 'crearCategoria',
+
+        datos: {
+
+          nombre: nombre,
+
+          descripcion: descripcion,
+
+          activo: activo
+
+        }
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo crear la categoría.'
+      );
+
+    }
+
+
+    alert(
+      respuesta.mensaje ||
+      'Categoría creada correctamente.'
+    );
+
+
+    cargarCategorias();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al crear categoría:',
+      error
+    );
+
+    alert(
+      'No se pudo crear la categoría.\n\n' +
+      error.message
+    );
+
+
+  } finally {
+
+    if (boton) {
+
+      boton.disabled = false;
+      boton.textContent =
+        'Guardar categoría';
+
+    }
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Formulario editar categoría
+ * ------------------------------------------------------------
+ */
+function mostrarFormularioEditarCategoria(
+  idCategoria
+) {
+
+  const contenedor =
+    document.getElementById(
+      'vista-categorias'
+    );
+
+  if (!contenedor) {
+    return;
+  }
+
+
+  contenedor.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-body">
+
+        <p>
+          Cargando categoría...
+        </p>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  cargarCategoriaParaEditar(
+    idCategoria
+  );
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Cargar categoría para editar
+ * ------------------------------------------------------------
+ */
+async function cargarCategoriaParaEditar(
+  idCategoria
+) {
+
+  const contenedor =
+    document.getElementById(
+      'vista-categorias'
+    );
+
+  try {
+
+    const respuesta =
+      await apiGet({
+
+        accion: 'categoria',
+
+        idCategoria: idCategoria
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo obtener la categoría.'
+      );
+
+    }
+
+
+    const categoria =
+      respuesta.datos;
+
+
+    if (!categoria) {
+
+      throw new Error(
+        'No se encontró la categoría.'
+      );
+
+    }
+
+
+    mostrarFormularioEditarCategoriaDatos(
+      categoria
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar categoría:',
+      error
+    );
+
+
+    contenedor.innerHTML = `
+
+      <div class="panel">
+
+        <div class="panel-body">
+
+          <div class="estado-inicial">
+
+            <div class="estado-icono">
+              !
+            </div>
+
+            <div>
+
+              <h3>
+                Error al cargar categoría
+              </h3>
+
+              <p>
+                ${error.message}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Mostrar formulario de edición
+ * ------------------------------------------------------------
+ */
+function mostrarFormularioEditarCategoriaDatos(
+  categoria
+) {
+
+  const contenedor =
+    document.getElementById(
+      'vista-categorias'
+    );
+
+  if (!contenedor) {
+    return;
+  }
+
+
+  const activo =
+    categoria.activo === true ||
+    categoria.activo === 'TRUE' ||
+    categoria.activo === 'true' ||
+    categoria.activo === 1 ||
+    categoria.activo === '1';
+
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+
+        <h1>Editar categoría</h1>
+
+        <p>
+          Modificar la información de la categoría
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>Datos de la categoría</h2>
+
+          <p>
+            Modifique la información que desea actualizar.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <form id="formEditarCategoria">
+
+
+          <div style="
+            display:grid;
+            grid-template-columns:1fr;
+            gap:18px;
+          ">
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Nombre *
+              </label>
+
+              <input
+                type="text"
+                id="editarCategoriaNombre"
+                value="${categoria.nombre || ''}"
+                required
+                maxlength="100"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label style="
+                display:block;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:6px;
+              ">
+                Descripción
+              </label>
+
+              <textarea
+                id="editarCategoriaDescripcion"
+                maxlength="250"
+                rows="4"
+                style="
+                  width:100%;
+                  padding:10px 12px;
+                  border:1px solid var(--color-border);
+                  border-radius:8px;
+                  font-size:13px;
+                  resize:vertical;
+                "
+              >${categoria.descripcion || ''}</textarea>
+
+            </div>
+
+
+          </div>
+
+
+          <div style="
+            margin-top:20px;
+            padding:14px;
+            background:var(--color-background);
+            border-radius:8px;
+          ">
+
+            <label style="
+              display:flex;
+              align-items:center;
+              gap:8px;
+              font-size:13px;
+              cursor:pointer;
+            ">
+
+              <input
+                type="checkbox"
+                id="editarCategoriaActivo"
+                ${activo ? 'checked' : ''}
+              >
+
+              Categoría activa
+
+            </label>
+
+          </div>
+
+
+          <div style="
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:22px;
+          ">
+
+            <button
+              type="button"
+              id="btnCancelarEditarCategoria"
+              style="
+                border:1px solid var(--color-border);
+                background:white;
+                color:var(--color-text);
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+              "
+            >
+              Cancelar
+            </button>
+
+
+            <button
+              type="submit"
+              style="
+                border:none;
+                background:var(--color-primary);
+                color:white;
+                padding:10px 18px;
+                border-radius:8px;
+                cursor:pointer;
+                font-size:13px;
+                font-weight:600;
+              "
+            >
+              Guardar cambios
+            </button>
+
+          </div>
+
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+
+  document
+    .getElementById(
+      'btnCancelarEditarCategoria'
+    )
+    .addEventListener(
+      'click',
+      cargarCategorias
+    );
+
+
+  document
+    .getElementById(
+      'formEditarCategoria'
+    )
+    .addEventListener(
+      'submit',
+      function(evento) {
+
+        guardarEdicionCategoria(
+          evento,
+          categoria.idCategoria ||
+          categoria.ID_CATEGORIA
+        );
+
+      }
+    );
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Guardar edición
+ * ------------------------------------------------------------
+ */
+async function guardarEdicionCategoria(
+  evento,
+  idCategoria
+) {
+
+  evento.preventDefault();
+
+
+  const boton =
+    document.querySelector(
+      '#formEditarCategoria button[type="submit"]'
+    );
+
+
+  if (boton) {
+
+    boton.disabled = true;
+    boton.textContent = 'Guardando...';
+
+  }
+
+
+  try {
+
+    const nombre =
+      document
+        .getElementById(
+          'editarCategoriaNombre'
+        )
+        .value
+        .trim();
+
+    const descripcion =
+      document
+        .getElementById(
+          'editarCategoriaDescripcion'
+        )
+        .value
+        .trim();
+
+    const activo =
+      document
+        .getElementById(
+          'editarCategoriaActivo'
+        )
+        .checked;
+
+
+    if (!nombre) {
+
+      throw new Error(
+        'El nombre de la categoría es obligatorio.'
+      );
+
+    }
+
+
+    const respuesta =
+      await apiPost({
+
+        accion: 'editarCategoria',
+
+        idCategoria:
+          Number(idCategoria),
+
+        datos: {
+
+          nombre: nombre,
+
+          descripcion: descripcion,
+
+          activo: activo
+
+        }
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo actualizar la categoría.'
+      );
+
+    }
+
+
+    alert(
+      respuesta.mensaje ||
+      'Categoría actualizada correctamente.'
+    );
+
+
+    cargarCategorias();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al editar categoría:',
+      error
+    );
+
+
+    alert(
+      'No se pudo actualizar la categoría.\n\n' +
+      error.message
+    );
+
+
+  } finally {
+
+    if (boton) {
+
+      boton.disabled = false;
+      boton.textContent =
+        'Guardar cambios';
+
+    }
+
+  }
+
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Activar / desactivar
+ * ------------------------------------------------------------
+ */
+async function cambiarEstadoCategoriaFrontend(
+  idCategoria,
+  nuevoEstado
+) {
+
+  const accionTexto =
+    nuevoEstado
+      ? 'activar'
+      : 'desactivar';
+
+
+  const confirmar =
+    confirm(
+      '¿Está seguro de que desea ' +
+      accionTexto +
+      ' esta categoría?'
+    );
+
+
+  if (!confirmar) {
+    return;
+  }
+
+
+  try {
+
+    const respuesta =
+      await apiPost({
+
+        accion:
+          'cambiarEstadoCategoria',
+
+        idCategoria:
+          Number(idCategoria),
+
+        activo:
+          nuevoEstado
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo cambiar el estado de la categoría.'
+      );
+
+    }
+
+
+    alert(
+      respuesta.mensaje ||
+      'Estado actualizado correctamente.'
+    );
+
+
+    cargarCategorias();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al cambiar estado de categoría:',
+      error
+    );
+
+
+    alert(
+      'No se pudo cambiar el estado de la categoría.\n\n' +
+      error.message
+    );
+
+  }
+
+}
   
   /*
    * Eventos del menú
