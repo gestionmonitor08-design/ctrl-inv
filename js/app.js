@@ -5190,11 +5190,6 @@ async function cargarClientes() {
         accion: 'clientes'
       });
 
-    console.log(
-      'CLIENTES: respuesta recibida',
-      respuesta
-    );
-
     if (!respuesta.ok) {
       throw new Error(
         respuesta.mensaje ||
