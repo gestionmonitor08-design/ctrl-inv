@@ -98,9 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
        * Usamos inventario porque este endpoint
        * devuelve productos + existencia actual.
        */
-      const respuesta = await apiGet({
-        accion: 'inventario'
-      });
+      const respuesta = await apiGet({accion:'productos'});
   
       if (!respuesta.ok) {
         throw new Error(
