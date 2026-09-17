@@ -5433,222 +5433,158 @@ function mostrarClientes(clientes) {
     tbody.innerHTML = filas;
   }
 
-document.addEventListener('DOMContentLoaded', function () {
+function abrirFormularioNuevoCliente() {
 
-  const btnNuevoCliente =
-    document.getElementById('btnNuevoCliente');
+  const contenedor =
+    document.getElementById('vista-clientes');
 
-  if (!btnNuevoCliente) {
+  if (!contenedor) {
     return;
   }
+
+  contenedor.innerHTML = `
+    <div class="pagina-header">
+
+      <div>
+        <h1>Nuevo cliente</h1>
+        <p>Registra un nuevo cliente.</p>
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="panel-body">
+
+        <form id="formNuevoCliente">
+
+          <div style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:15px;
+          ">
+
+            <div>
+              <label>Nombre *</label>
+              <input
+                type="text"
+                id="clienteNombre"
+                required
+                style="width:100%;padding:10px;"
+              >
+            </div>
+
+            <div>
+              <label>Compañía</label>
+              <input
+                type="text"
+                id="clienteCompania"
+                style="width:100%;padding:10px;"
+              >
+            </div>
+
+            <div>
+              <label>Documento</label>
+              <input
+                type="text"
+                id="clienteDocumento"
+                style="width:100%;padding:10px;"
+              >
+            </div>
+
+            <div>
+              <label>Email</label>
+              <input
+                type="email"
+                id="clienteEmail"
+                style="width:100%;padding:10px;"
+              >
+            </div>
+
+            <div>
+              <label>Teléfono</label>
+              <input
+                type="text"
+                id="clienteTelefono"
+                style="width:100%;padding:10px;"
+              >
+            </div>
+
+            <div>
+              <label>Dirección</label>
+              <input
+                type="text"
+                id="clienteDireccion"
+                style="width:100%;padding:10px;"
+              >
+            </div>
+
+          </div>
+
+          <div style="
+            margin-top:20px;
+            display:flex;
+            gap:10px;
+          ">
+
+            <button
+              type="submit"
+              class="btn-primary"
+            >
+              Guardar cliente
+            </button>
+
+            <button
+              type="button"
+              id="btnCancelarNuevoCliente"
+            >
+              Cancelar
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+  const btnCancelar =
+    document.getElementById(
+      'btnCancelarNuevoCliente'
+    );
+
+  if (btnCancelar) {
+
+    btnCancelar.addEventListener(
+      'click',
+      function () {
+
+        cambiarVista('clientes');
+
+      }
+    );
+
+  }
+
+}  
+
+/*
+ * Nuevo cliente
+ */
+const btnNuevoCliente =
+  document.getElementById('btnNuevoCliente');
+
+if (btnNuevoCliente) {
 
   btnNuevoCliente.addEventListener('click', function () {
 
-    const contenedor =
-      document.getElementById('vista-clientes');
-
-    if (!contenedor) {
-      return;
-    }
-
-    contenedor.innerHTML = `
-      <div class="pagina-header">
-
-        <div>
-          <h1>Nuevo cliente</h1>
-          <p>Registra un nuevo cliente.</p>
-        </div>
-
-      </div>
-
-      <div class="panel">
-
-        <div class="panel-body">
-
-          <form id="formNuevoCliente">
-
-            <div style="
-              display:grid;
-              grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-              gap:15px;
-            ">
-
-              <div>
-                <label>Nombre *</label>
-                <input
-                  type="text"
-                  id="clienteNombre"
-                  required
-                  style="width:100%;padding:10px;"
-                >
-              </div>
-
-              <div>
-                <label>Compañía</label>
-                <input
-                  type="text"
-                  id="clienteCompania"
-                  style="width:100%;padding:10px;"
-                >
-              </div>
-
-              <div>
-                <label>Documento</label>
-                <input
-                  type="text"
-                  id="clienteDocumento"
-                  style="width:100%;padding:10px;"
-                >
-              </div>
-
-              <div>
-                <label>Email</label>
-                <input
-                  type="email"
-                  id="clienteEmail"
-                  style="width:100%;padding:10px;"
-                >
-              </div>
-
-              <div>
-                <label>Teléfono</label>
-                <input
-                  type="text"
-                  id="clienteTelefono"
-                  style="width:100%;padding:10px;"
-                >
-              </div>
-
-              <div>
-                <label>Dirección</label>
-                <input
-                  type="text"
-                  id="clienteDireccion"
-                  style="width:100%;padding:10px;"
-                >
-              </div>
-
-            </div>
-
-            <div style="
-              margin-top:20px;
-              display:flex;
-              gap:10px;
-            ">
-
-              <button
-                type="submit"
-                class="btn-primary"
-              >
-                Guardar cliente
-              </button>
-
-              <button
-                type="button"
-                id="btnCancelarNuevoCliente"
-              >
-                Cancelar
-              </button>
-
-            </div>
-
-          </form>
-
-        </div>
-
-      </div>
-    `;
-
-    const btnCancelar =
-      document.getElementById(
-        'btnCancelarNuevoCliente'
-      );
-
-    if (btnCancelar) {
-
-      btnCancelar.addEventListener(
-        'click',
-        function () {
-
-          cambiarVista('clientes');
-
-        }
-      );
-
-    }
+    abrirFormularioNuevoCliente();
 
   });
 
-});
-
-
-document.addEventListener('submit', async function (e) {
-
-  if (e.target.id !== 'formNuevoCliente') {
-    return;
-  }
-
-  e.preventDefault();
-
-  const datosCliente = {
-
-    nombre:
-      document.getElementById('clienteNombre').value.trim(),
-
-    compania:
-      document.getElementById('clienteCompania').value.trim(),
-
-    documento:
-      document.getElementById('clienteDocumento').value.trim(),
-
-    email:
-      document.getElementById('clienteEmail').value.trim(),
-
-    telefono:
-      document.getElementById('clienteTelefono').value.trim(),
-
-    direccion:
-      document.getElementById('clienteDireccion').value.trim()
-
-  };
-
-  try {
-
-    const respuesta =
-      await apiPost({
-        accion: 'crearCliente',
-        datos: datosCliente
-      });
-
-    if (!respuesta.ok) {
-
-      throw new Error(
-        respuesta.mensaje ||
-        'No se pudo crear el cliente.'
-      );
-
-    }
-
-    alert('Cliente creado correctamente.');
-
-    cambiarVista('clientes');
-
-  } catch (error) {
-
-    console.error(
-      'Error al crear cliente:',
-      error
-    );
-
-    alert(
-      error.message ||
-      'Ocurrió un error al crear el cliente.'
-    );
-
-  }
-
-});  
-
+}
   
   /*
    * Eventos del menú
