@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }    
 
     if (nombreVista === 'clientes') {
-      cargarClientes();
+      mostrarVistaClientes();
     }
     
   }
@@ -5760,6 +5760,159 @@ async function guardarNuevoCliente(evento) {
     }
 
   }
+
+}
+
+function mostrarVistaClientes() {
+
+  const contenedor =
+    document.getElementById('vista-clientes');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="pagina-header">
+
+      <div>
+        <h1>Clientes</h1>
+        <p>Gestión de clientes</p>
+      </div>
+
+      <div>
+        <button
+          id="btnNuevoCliente"
+          class="btn-primary"
+          type="button"
+        >
+          + Nuevo cliente
+        </button>
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Listado de clientes</h2>
+          <p>
+            Consulta y administra los clientes registrados.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel-body">
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            margin-bottom:15px;
+            flex-wrap:wrap;
+          "
+        >
+
+          <input
+            type="text"
+            id="buscarCliente"
+            placeholder="Buscar cliente..."
+            style="
+              flex:1;
+              min-width:220px;
+              padding:10px;
+              border:1px solid var(--color-border);
+              border-radius:7px;
+            "
+          >
+
+          <select
+            id="filtroEstadoCliente"
+            style="
+              padding:10px;
+              border:1px solid var(--color-border);
+              border-radius:7px;
+            "
+          >
+            <option value="todos">Todos</option>
+            <option value="activos">Activos</option>
+            <option value="inactivos">Inactivos</option>
+          </select>
+
+        </div>
+
+        <div style="overflow-x:auto;">
+
+          <table
+            id="tablaClientes"
+            style="
+              width:100%;
+              border-collapse:collapse;
+            "
+          >
+
+            <thead>
+
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Compañía</th>
+                <th>Documento</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td
+                  colspan="8"
+                  style="
+                    text-align:center;
+                    padding:20px;
+                  "
+                >
+                  Cargando clientes...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  const btnNuevoCliente =
+    document.getElementById(
+      'btnNuevoCliente'
+    );
+
+  if (btnNuevoCliente) {
+
+    btnNuevoCliente.addEventListener(
+      'click',
+      abrirFormularioNuevoCliente
+    );
+
+  }
+
+
+  cargarClientes();
 
 }
   
