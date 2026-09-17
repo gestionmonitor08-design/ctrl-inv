@@ -5731,7 +5731,7 @@ async function guardarNuevoCliente(evento) {
     );
 
 
-    cargarClientes();
+    cambiarVista('clientes');
 
 
   } catch (error) {
