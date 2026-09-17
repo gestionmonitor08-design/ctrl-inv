@@ -5434,6 +5434,367 @@ function mostrarClientes(clientes) {
     tbody.innerHTML = filas;
   }
 
+const botonesEditar =
+  tbody.querySelectorAll(
+    '.btn-editar-cliente'
+  );
+
+botonesEditar.forEach(function(boton) {
+
+  boton.addEventListener(
+    'click',
+    function() {
+
+      const idCliente =
+        Number(
+          this.getAttribute('data-id')
+        );
+
+      editarClienteDesdeTabla(
+        idCliente
+      );
+
+    }
+  );
+
+});
+
+  
+async function editarClienteDesdeTabla(idCliente) {
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'cliente',
+        idCliente: idCliente
+      });
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo obtener el cliente.'
+      );
+    }
+
+    const cliente = respuesta.datos;
+
+    const contenedor =
+      document.getElementById('vista-clientes');
+
+    if (!contenedor) {
+      return;
+    }
+
+    contenedor.innerHTML = `
+      <div class="pagina-header">
+
+        <div>
+          <h1>Editar cliente</h1>
+          <p>Modifica la información del cliente.</p>
+        </div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-body">
+
+          <form id="formEditarCliente">
+
+            <div
+              style="
+                display:grid;
+                grid-template-columns:
+                  repeat(auto-fit,minmax(250px,1fr));
+                gap:15px;
+              "
+            >
+
+              <div>
+                <label>Nombre *</label>
+
+                <input
+                  type="text"
+                  id="editarClienteNombre"
+                  value="${cliente.NOMBRE || ''}"
+                  required
+                  style="width:100%;padding:10px;"
+                >
+              </div>
+
+              <div>
+                <label>Compañía</label>
+
+                <input
+                  type="text"
+                  id="editarClienteCompania"
+                  value="${cliente.COMPAÑIA || ''}"
+                  style="width:100%;padding:10px;"
+                >
+              </div>
+
+              <div>
+                <label>Documento</label>
+
+                <input
+                  type="text"
+                  id="editarClienteDocumento"
+                  value="${cliente.DOCUMENTO || ''}"
+                  style="width:100%;padding:10px;"
+                >
+              </div>
+
+              <div>
+                <label>Email</label>
+
+                <input
+                  type="email"
+                  id="editarClienteEmail"
+                  value="${cliente.EMAIL || ''}"
+                  style="width:100%;padding:10px;"
+                >
+              </div>
+
+              <div>
+                <label>Teléfono</label>
+
+                <input
+                  type="text"
+                  id="editarClienteTelefono"
+                  value="${cliente.TELEFONO || ''}"
+                  style="width:100%;padding:10px;"
+                >
+              </div>
+
+              <div>
+                <label>Dirección</label>
+
+                <input
+                  type="text"
+                  id="editarClienteDireccion"
+                  value="${cliente.DIRECCION || ''}"
+                  style="width:100%;padding:10px;"
+                >
+              </div>
+
+            </div>
+
+            <div
+              style="
+                margin-top:20px;
+                display:flex;
+                gap:10px;
+              "
+            >
+
+              <button
+                type="submit"
+                class="btn-primary"
+              >
+                Guardar cambios
+              </button>
+
+              <button
+                type="button"
+                id="btnCancelarEditarCliente"
+              >
+                Cancelar
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+    `;
+
+    const formulario =
+      document.getElementById(
+        'formEditarCliente'
+      );
+
+    if (formulario) {
+
+      formulario.addEventListener(
+        'submit',
+        function(evento) {
+
+          guardarEdicionCliente(
+            evento,
+            idCliente
+          );
+
+        }
+      );
+
+    }
+
+    const btnCancelar =
+      document.getElementById(
+        'btnCancelarEditarCliente'
+      );
+
+    if (btnCancelar) {
+
+      btnCancelar.addEventListener(
+        'click',
+        function() {
+
+          mostrarVistaClientes();
+
+        }
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      'Error al editar cliente:',
+      error
+    );
+
+    alert(
+      'No se pudo cargar el cliente.\n\n' +
+      error.message
+    );
+
+  }
+
+}
+
+
+async function guardarEdicionCliente(
+  evento,
+  idCliente
+) {
+
+  evento.preventDefault();
+
+  const boton =
+    document.querySelector(
+      '#formEditarCliente button[type="submit"]'
+    );
+
+  if (boton) {
+
+    boton.disabled = true;
+    boton.textContent = 'Guardando...';
+
+  }
+
+  try {
+
+    const nombre =
+      document
+        .getElementById('editarClienteNombre')
+        .value
+        .trim();
+
+    const compania =
+      document
+        .getElementById('editarClienteCompania')
+        .value
+        .trim();
+
+    const documento =
+      document
+        .getElementById('editarClienteDocumento')
+        .value
+        .trim();
+
+    const email =
+      document
+        .getElementById('editarClienteEmail')
+        .value
+        .trim();
+
+    const telefono =
+      document
+        .getElementById('editarClienteTelefono')
+        .value
+        .trim();
+
+    const direccion =
+      document
+        .getElementById('editarClienteDireccion')
+        .value
+        .trim();
+
+    if (!nombre) {
+
+      throw new Error(
+        'El nombre del cliente es obligatorio.'
+      );
+
+    }
+
+    const respuesta =
+      await apiPost({
+
+        accion: 'editarCliente',
+
+        idCliente: idCliente,
+
+        datos: {
+
+          nombre: nombre,
+          compania: compania,
+          documento: documento,
+          email: email,
+          telefono: telefono,
+          direccion: direccion
+
+        }
+
+      });
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo actualizar el cliente.'
+      );
+
+    }
+
+    alert(
+      respuesta.mensaje ||
+      'Cliente actualizado correctamente.'
+    );
+
+    mostrarVistaClientes();
+
+  } catch (error) {
+
+    console.error(
+      'Error al actualizar cliente:',
+      error
+    );
+
+    alert(
+      'No se pudo actualizar el cliente.\n\n' +
+      error.message
+    );
+
+  } finally {
+
+    if (boton) {
+
+      boton.disabled = false;
+      boton.textContent =
+        'Guardar cambios';
+
+    }
+
+  }
+
+}
+  
+  
 function abrirFormularioNuevoCliente() {
 
   const contenedor =
