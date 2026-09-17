@@ -5571,16 +5571,12 @@ function abrirFormularioNuevoCliente() {
     );
 
   if (btnCancelar) {
-
     btnCancelar.addEventListener(
       'click',
       function () {
-
-        cambiarVista('clientes');
-
+        mostrarVistaClientes();
       }
     );
-
   }
 
 }  
@@ -5732,7 +5728,7 @@ async function guardarNuevoCliente(evento) {
     );
 
 
-    cambiarVista('clientes');
+    mostrarVistaClientes();
 
 
   } catch (error) {
