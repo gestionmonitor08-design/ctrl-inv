@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
   }
 
+  window.cambiarVista = cambiarVista;
 
   /*
    * Cargar productos desde Google Apps Script
