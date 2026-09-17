@@ -5550,6 +5550,20 @@ function abrirFormularioNuevoCliente() {
     </div>
   `;
 
+  const formulario =
+    document.getElementById(
+      'formNuevoCliente'
+    );
+  
+  if (formulario) {
+  
+    formulario.addEventListener(
+      'submit',
+      guardarNuevoCliente
+    );
+  
+  }
+  
   const btnCancelar =
     document.getElementById(
       'btnCancelarNuevoCliente'
