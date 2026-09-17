@@ -5585,6 +5585,169 @@ if (btnNuevoCliente) {
   });
 
 }
+
+async function guardarNuevoCliente(evento) {
+
+  evento.preventDefault();
+
+
+  const boton =
+    document.querySelector(
+      '#formNuevoCliente button[type="submit"]'
+    );
+
+
+  if (boton) {
+
+    boton.disabled = true;
+    boton.textContent = 'Guardando...';
+
+  }
+
+
+  try {
+
+    const nombre =
+      document
+        .getElementById(
+          'clienteNombre'
+        )
+        .value
+        .trim();
+
+
+    const compania =
+      document
+        .getElementById(
+          'clienteCompania'
+        )
+        .value
+        .trim();
+
+
+    const documento =
+      document
+        .getElementById(
+          'clienteDocumento'
+        )
+        .value
+        .trim();
+
+
+    const email =
+      document
+        .getElementById(
+          'clienteEmail'
+        )
+        .value
+        .trim();
+
+
+    const telefono =
+      document
+        .getElementById(
+          'clienteTelefono'
+        )
+        .value
+        .trim();
+
+
+    const direccion =
+      document
+        .getElementById(
+          'clienteDireccion'
+        )
+        .value
+        .trim();
+
+
+    if (!nombre) {
+
+      throw new Error(
+        'El nombre del cliente es obligatorio.'
+      );
+
+    }
+
+
+    const respuesta =
+      await apiPost({
+
+        accion:
+          'crearCliente',
+
+        datos: {
+
+          nombre:
+            nombre,
+
+          compania:
+            compania,
+
+          documento:
+            documento,
+
+          email:
+            email,
+
+          telefono:
+            telefono,
+
+          direccion:
+            direccion
+
+        }
+
+      });
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo crear el cliente.'
+      );
+
+    }
+
+
+    alert(
+      respuesta.mensaje ||
+      'Cliente creado correctamente.'
+    );
+
+
+    cargarClientes();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al crear cliente:',
+      error
+    );
+
+
+    alert(
+      'No se pudo crear el cliente.\n\n' +
+      error.message
+    );
+
+
+  } finally {
+
+    if (boton) {
+
+      boton.disabled = false;
+      boton.textContent =
+        'Guardar cliente';
+
+    }
+
+  }
+
+}
+  
   
   /*
    * Eventos del menú
