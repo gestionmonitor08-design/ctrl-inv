@@ -5432,32 +5432,35 @@ function mostrarClientes(clientes) {
     }
   
     tbody.innerHTML = filas;
+
+      const botonesEditar =
+      tbody.querySelectorAll(
+        '.btn-editar-cliente'
+      );
+    
+    botonesEditar.forEach(function(boton) {
+    
+      boton.addEventListener(
+        'click',
+        function() {
+    
+          const idCliente =
+            Number(
+              this.getAttribute('data-id')
+            );
+    
+          editarClienteDesdeTabla(
+            idCliente
+          );
+    
+        }
+      );
+    
+    });
+  
   }
 
-const botonesEditar =
-  tbody.querySelectorAll(
-    '.btn-editar-cliente'
-  );
 
-botonesEditar.forEach(function(boton) {
-
-  boton.addEventListener(
-    'click',
-    function() {
-
-      const idCliente =
-        Number(
-          this.getAttribute('data-id')
-        );
-
-      editarClienteDesdeTabla(
-        idCliente
-      );
-
-    }
-  );
-
-});
 
   
 async function editarClienteDesdeTabla(idCliente) {
