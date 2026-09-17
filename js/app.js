@@ -5581,6 +5581,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+
+document.addEventListener('submit', async function (e) {
+
+  if (e.target.id !== 'formNuevoCliente') {
+    return;
+  }
+
+  e.preventDefault();
+
+  const datosCliente = {
+
+    nombre:
+      document.getElementById('clienteNombre').value.trim(),
+
+    compania:
+      document.getElementById('clienteCompania').value.trim(),
+
+    documento:
+      document.getElementById('clienteDocumento').value.trim(),
+
+    email:
+      document.getElementById('clienteEmail').value.trim(),
+
+    telefono:
+      document.getElementById('clienteTelefono').value.trim(),
+
+    direccion:
+      document.getElementById('clienteDireccion').value.trim()
+
+  };
+
+  try {
+
+    const respuesta =
+      await apiPost({
+        accion: 'crearCliente',
+        datos: datosCliente
+      });
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo crear el cliente.'
+      );
+
+    }
+
+    alert('Cliente creado correctamente.');
+
+    cambiarVista('clientes');
+
+  } catch (error) {
+
+    console.error(
+      'Error al crear cliente:',
+      error
+    );
+
+    alert(
+      error.message ||
+      'Ocurrió un error al crear el cliente.'
+    );
+
+  }
+
+});  
+
   
   /*
    * Eventos del menú
