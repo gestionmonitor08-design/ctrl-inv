@@ -6763,6 +6763,318 @@ function mostrarVistaKardex() {
   }
 
 }
+
+async function consultarKardex() {
+
+  const selector =
+    document.getElementById(
+      'selectorProductoKardex'
+    );
+
+  const resultado =
+    document.getElementById(
+      'resultadoKardex'
+    );
+
+  if (!selector || !resultado) {
+    return;
+  }
+
+  const idProducto =
+    Number(selector.value);
+
+  if (!idProducto) {
+
+    alert(
+      'Selecciona un producto para consultar el Kardex.'
+    );
+
+    return;
+  }
+
+  resultado.innerHTML = `
+    <div class="panel">
+      <div class="panel-body">
+        <p>
+          Cargando Kardex...
+        </p>
+      </div>
+    </div>
+  `;
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'kardex',
+        idProducto: idProducto
+      });
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo cargar el Kardex.'
+      );
+
+    }
+
+    mostrarKardex(
+      respuesta
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al consultar Kardex:',
+      error
+    );
+
+    resultado.innerHTML = `
+      <div class="panel">
+        <div class="panel-body">
+
+          <p style="color:#b91c1c;">
+            No se pudo cargar el Kardex.
+          </p>
+
+          <p>
+            ${error.message}
+          </p>
+
+        </div>
+      </div>
+    `;
+
+  }
+
+}
+
+function mostrarKardex(respuesta) {
+
+  const resultado =
+    document.getElementById(
+      'resultadoKardex'
+    );
+
+  if (!resultado) {
+    return;
+  }
+
+  const producto =
+    respuesta.producto || {};
+
+  const movimientos =
+    respuesta.movimientos || [];
+
+  const existenciaActual =
+    Number(
+      respuesta.existenciaActual || 0
+    );
+
+  if (movimientos.length === 0) {
+
+    resultado.innerHTML = `
+      <div class="panel">
+
+        <div class="panel-header">
+          <div>
+            <h2>
+              ${producto.codigo || ''} -
+              ${producto.nombre || ''}
+            </h2>
+
+            <p>
+              No existen movimientos registrados
+              para este producto.
+            </p>
+          </div>
+        </div>
+
+        <div class="panel-body">
+
+          <p>
+            Existencia actual:
+            <strong>${existenciaActual}</strong>
+            ${producto.unidadMedida || ''}
+          </p>
+
+        </div>
+
+      </div>
+    `;
+
+    return;
+  }
+
+  const filas =
+    movimientos.map(
+      function(movimiento) {
+
+        const fecha =
+          movimiento.fecha
+            ? new Date(
+                movimiento.fecha
+              ).toLocaleString('es-PE')
+            : '';
+
+        const entrada =
+          Number(
+            movimiento.entrada || 0
+          );
+
+        const salida =
+          Number(
+            movimiento.salida || 0
+          );
+
+        const costoUnitario =
+          Number(
+            movimiento.costoUnitario || 0
+          );
+
+        const costoTotal =
+          Number(
+            movimiento.costoTotal || 0
+          );
+
+        return `
+          <tr>
+
+            <td style="padding:10px;">
+              ${fecha}
+            </td>
+
+            <td style="padding:10px;">
+              ${movimiento.tipo || ''}
+            </td>
+
+            <td style="padding:10px;">
+              ${movimiento.documento || ''}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              ${entrada}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              ${salida}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              <strong>
+                ${movimiento.stockAcumulado || 0}
+              </strong>
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${costoUnitario.toFixed(2)}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${costoTotal.toFixed(2)}
+            </td>
+
+            <td style="padding:10px;">
+              ${movimiento.idUsuario || ''}
+            </td>
+
+          </tr>
+        `;
+
+      }
+    );
+
+  resultado.innerHTML = `
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>
+            ${producto.codigo || ''} -
+            ${producto.nombre || ''}
+          </h2>
+
+          <p>
+            Unidad:
+            <strong>
+              ${producto.unidadMedida || ''}
+            </strong>
+            &nbsp; | &nbsp;
+
+            Costo promedio actual:
+            <strong>
+              S/ ${Number(
+                producto.costoUnitario || 0
+              ).toFixed(2)}
+            </strong>
+          </p>
+
+        </div>
+
+        <div>
+
+          <p>
+            Existencia actual
+          </p>
+
+          <h2>
+            ${existenciaActual}
+            ${producto.unidadMedida || ''}
+          </h2>
+
+        </div>
+
+      </div>
+
+      <div class="panel-body">
+
+        <div style="overflow-x:auto;">
+
+          <table
+            style="
+              width:100%;
+              border-collapse:collapse;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Documento</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Stock</th>
+                <th>Costo unit.</th>
+                <th>Costo total</th>
+                <th>Usuario</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              ${filas.join('')}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+  
+  
   
 async function cargarInventario() {
 
