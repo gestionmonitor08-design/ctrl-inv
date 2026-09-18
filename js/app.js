@@ -89,6 +89,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nombreVista === 'kardex') {
       mostrarVistaKardex();
     }
+
+    if (nombreVista === 'compras') {
+      mostrarVistaCompras();
+    }
   }
 
   window.cambiarVista = cambiarVista;
