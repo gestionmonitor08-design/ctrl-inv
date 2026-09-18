@@ -7071,6 +7071,29 @@ function mostrarCompras(compras) {
       </tr>
     `;
 
+    const botonesVer =
+  tbody.querySelectorAll(
+    '.btn-ver-compra'
+  );
+
+  botonesVer.forEach(function(boton) {
+    
+    boton.addEventListener(
+      'click',
+      function() {
+  
+        const idCompra =
+          Number(
+            this.getAttribute('data-id')
+          );
+  
+        verCompraDesdeTabla(idCompra);
+  
+      }
+    );
+  
+  });
+    
     return;
   }
 
