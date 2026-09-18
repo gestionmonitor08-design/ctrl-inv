@@ -7161,6 +7161,255 @@ function mostrarCompras(compras) {
     filas.join('');
 
 }  
+
+async function verCompraDesdeTabla(idCompra) {
+
+  const confirmarId =
+    Number(idCompra);
+
+  if (!confirmarId) {
+    return;
+  }
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'compra',
+        idCompra: confirmarId
+      });
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo consultar la compra.'
+      );
+
+    }
+
+    mostrarDetalleCompra(
+      respuesta.datos
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al consultar compra:',
+      error
+    );
+
+    alert(
+      'No se pudo consultar la compra.\n\n' +
+      error.message
+    );
+
+  }
+
+}
+
+function mostrarDetalleCompra(datos) {
+
+  const resultado =
+    document.getElementById(
+      'resultadoDetalleCompra'
+    );
+
+  if (!resultado) {
+    return;
+  }
+
+  const compra =
+    datos.compra || {};
+
+  const detalles =
+    datos.detalles || [];
+
+  const filas =
+    detalles.map(
+      function(detalle) {
+
+        return `
+          <tr>
+
+            <td style="padding:10px;">
+              ${detalle.ID_DETALLE || ''}
+            </td>
+
+            <td style="padding:10px;">
+              ${detalle.ID_PRODUCTO || ''}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              ${Number(
+                detalle.CANTIDAD || 0
+              )}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${Number(
+                detalle.COSTO_UNITARIO || 0
+              ).toFixed(2)}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${Number(
+                detalle.DESCUENTO || 0
+              ).toFixed(2)}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${Number(
+                detalle.TOTAL || 0
+              ).toFixed(2)}
+            </td>
+
+          </tr>
+        `;
+
+      }
+    );
+
+  resultado.innerHTML = `
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>
+            Compra #${compra.ID_COMPRA || ''}
+          </h2>
+
+          <p>
+            Factura:
+            <strong>
+              ${compra.FACTURA || ''}
+            </strong>
+          </p>
+
+        </div>
+
+        <div>
+
+          <p>
+            Estado
+          </p>
+
+          <strong>
+            ${compra.ESTADO || ''}
+          </strong>
+
+        </div>
+
+      </div>
+
+      <div class="panel-body">
+
+        <p>
+          <strong>Proveedor:</strong>
+          ${compra.ID_PROVEEDOR || ''}
+        </p>
+
+        <p>
+          <strong>Fecha:</strong>
+          ${
+            compra.FECHA
+              ? new Date(
+                  compra.FECHA
+                ).toLocaleDateString('es-PE')
+              : ''
+          }
+        </p>
+
+        <div
+          style="
+            overflow-x:auto;
+            margin-top:20px;
+          "
+        >
+
+          <table
+            style="
+              width:100%;
+              border-collapse:collapse;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>Detalle</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Costo unit.</th>
+                <th>Descuento</th>
+                <th>Total</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              ${filas.join('')}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <div
+          style="
+            margin-top:20px;
+            text-align:right;
+          "
+        >
+
+          <p>
+            Subtotal:
+            <strong>
+              S/ ${Number(
+                compra.SUBTOTAL || 0
+              ).toFixed(2)}
+            </strong>
+          </p>
+
+          <p>
+            Descuento:
+            <strong>
+              S/ ${Number(
+                compra.DESCUENTO || 0
+              ).toFixed(2)}
+            </strong>
+          </p>
+
+          <p>
+            Impuesto:
+            <strong>
+              S/ ${Number(
+                compra.IMPUESTO || 0
+              ).toFixed(2)}
+            </strong>
+          </p>
+
+          <h3>
+            Total:
+            S/ ${Number(
+              compra.TOTAL || 0
+            ).toFixed(2)}
+          </h3>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+}  
   
   
 async function consultarKardex() {
