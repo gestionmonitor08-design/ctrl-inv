@@ -6630,6 +6630,58 @@ function mostrarVistaInventario() {
 
 }
 
+function aplicarFiltrosInventario() {
+
+  const buscador =
+    document.getElementById(
+      'buscarInventario'
+    );
+
+  const texto =
+    buscador
+      ? buscador.value.trim().toLowerCase()
+      : '';
+
+  const inventarioFiltrado =
+    inventarioActual.filter(
+      function(producto) {
+
+        const id =
+          String(
+            producto.ID_PRODUCTO || ''
+          ).toLowerCase();
+
+        const codigo =
+          String(
+            producto.CODIGO || ''
+          ).toLowerCase();
+
+        const nombre =
+          String(
+            producto.NOMBRE || ''
+          ).toLowerCase();
+
+        const unidad =
+          String(
+            producto.UNIDAD_MEDIDA || ''
+          ).toLowerCase();
+
+        return (
+          id.includes(texto) ||
+          codigo.includes(texto) ||
+          nombre.includes(texto) ||
+          unidad.includes(texto)
+        );
+
+      }
+    );
+
+  mostrarInventario(
+    inventarioFiltrado
+  );
+
+}
+  
   
   
   /*
