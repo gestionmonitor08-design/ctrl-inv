@@ -6857,6 +6857,11 @@ function mostrarVistaCompras() {
 
       </div>
 
+      <div
+        id="resultadoDetalleCompra"
+        style="margin-top:20px;"
+      ></div>    
+
       <div class="panel-body">
 
         <div
