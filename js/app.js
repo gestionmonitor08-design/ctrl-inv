@@ -5170,6 +5170,8 @@ async function cambiarEstadoProveedorFrontend(
 
 }  
 
+let clientesActuales = [];
+  
 /*
  * ------------------------------------------------------------
  * Cargar clientes
@@ -5183,7 +5185,7 @@ async function cargarClientes() {
   if (!contenedor) {
     return;
   }
-
+  
   try {
 
     const respuesta =
@@ -5198,7 +5200,9 @@ async function cargarClientes() {
       );
     }
 
-    mostrarClientes(respuesta.datos);
+    clientesActuales = respuesta.datos;
+
+    mostrarClientes(clientesActuales);
 
   } catch (error) {
 
@@ -5487,6 +5491,89 @@ function mostrarClientes(clientes) {
     
     });
   }
+
+  function aplicarFiltrosClientes() {
+
+  const buscador =
+    document.getElementById(
+      'buscarCliente'
+    );
+
+  const filtroEstado =
+    document.getElementById(
+      'filtroEstadoCliente'
+    );
+
+  if (!buscador || !filtroEstado) {
+    return;
+  }
+
+  const texto =
+    buscador.value
+      .trim()
+      .toLowerCase();
+
+  const estado =
+    filtroEstado.value;
+
+  const clientesFiltrados =
+    clientesActuales.filter(
+      function(cliente) {
+
+        const activo =
+          cliente.ACTIVO === true ||
+          cliente.ACTIVO === 'TRUE' ||
+          cliente.ACTIVO === 1 ||
+          cliente.ACTIVO === '1';
+
+        const coincideTexto =
+          !texto ||
+          String(
+            cliente.NOMBRE || ''
+          ).toLowerCase().includes(texto) ||
+
+          String(
+            cliente.COMPAÑIA || ''
+          ).toLowerCase().includes(texto) ||
+
+          String(
+            cliente.DOCUMENTO || ''
+          ).toLowerCase().includes(texto) ||
+
+          String(
+            cliente.TELEFONO || ''
+          ).toLowerCase().includes(texto) ||
+
+          String(
+            cliente.EMAIL || ''
+          ).toLowerCase().includes(texto);
+
+        const coincideEstado =
+          estado === 'todos' ||
+
+          (
+            estado === 'activos' &&
+            activo
+          ) ||
+
+          (
+            estado === 'inactivos' &&
+            !activo
+          );
+
+        return (
+          coincideTexto &&
+          coincideEstado
+        );
+
+      }
+    );
+
+  mostrarClientes(
+    clientesFiltrados
+  );
+
+}
 
   async function cambiarEstadoClienteDesdeTabla(
     idCliente,
@@ -6373,7 +6460,34 @@ function mostrarVistaClientes() {
 
   }
 
-
+  const buscadorCliente =
+    document.getElementById(
+      'buscarCliente'
+    );
+  
+  if (buscadorCliente) {
+  
+    buscadorCliente.addEventListener(
+      'input',
+      aplicarFiltrosClientes
+    );
+  
+  }
+  
+  const filtroEstadoCliente =
+    document.getElementById(
+      'filtroEstadoCliente'
+    );
+  
+  if (filtroEstadoCliente) {
+  
+    filtroEstadoCliente.addEventListener(
+      'change',
+      aplicarFiltrosClientes
+    );
+  
+  }
+  
   cargarClientes();
 
 }
