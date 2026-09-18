@@ -5457,10 +5457,112 @@ function mostrarClientes(clientes) {
       );
     
     });
-  
+
+  const botonesEstado =
+  tbody.querySelectorAll(
+    '.btn-estado-cliente'
+  );
+
+  botonesEstado.forEach(function(boton) {
+    
+      boton.addEventListener(
+        'click',
+        function() {
+    
+          const idCliente =
+            Number(
+              this.getAttribute('data-id')
+            );
+    
+          const activoActual =
+            this.getAttribute('data-activo') === 'true';
+    
+          cambiarEstadoClienteDesdeTabla(
+            idCliente,
+            activoActual
+          );
+    
+        }
+      );
+    
+    });
   }
 
-
+  async function cambiarEstadoClienteDesdeTabla(
+    idCliente,
+    activoActual
+  ) {
+  
+    const nuevoEstado =
+      !activoActual;
+  
+    const accionTexto =
+      nuevoEstado
+        ? 'activar'
+        : 'desactivar';
+  
+    const confirmar =
+      confirm(
+        '¿Deseas ' +
+        accionTexto +
+        ' este cliente?'
+      );
+  
+    if (!confirmar) {
+      return;
+    }
+  
+    try {
+  
+      const respuesta =
+        await apiPost({
+  
+          accion:
+            'cambiarEstadoCliente',
+  
+          idCliente:
+            idCliente,
+  
+          activo:
+            nuevoEstado
+  
+        });
+  
+      if (!respuesta.ok) {
+  
+        throw new Error(
+          respuesta.mensaje ||
+          'No se pudo cambiar el estado del cliente.'
+        );
+  
+      }
+  
+      alert(
+        respuesta.mensaje ||
+        (
+          nuevoEstado
+            ? 'Cliente activado correctamente.'
+            : 'Cliente desactivado correctamente.'
+        )
+      );
+  
+      mostrarVistaClientes();
+  
+    } catch (error) {
+  
+      console.error(
+        'Error al cambiar estado del cliente:',
+        error
+      );
+  
+      alert(
+        'No se pudo cambiar el estado del cliente.\n\n' +
+        error.message
+      );
+  
+    }
+  
+  }
 
   
 async function editarClienteDesdeTabla(idCliente) {
