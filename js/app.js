@@ -6495,6 +6495,141 @@ function mostrarVistaClientes() {
   cargarClientes();
 
 }
+
+function mostrarVistaInventario() {
+
+  const contenedor =
+    document.getElementById('vista-inventario');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="pagina-header">
+
+      <div>
+        <h1>Inventario</h1>
+        <p>
+          Consulta las existencias actuales de los productos.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Existencias</h2>
+
+          <p>
+            Consulta la cantidad disponible y el costo promedio
+            de cada producto.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel-body">
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            margin-bottom:15px;
+            flex-wrap:wrap;
+          "
+        >
+
+          <input
+            type="text"
+            id="buscarInventario"
+            placeholder="Buscar producto..."
+            style="
+              flex:1;
+              min-width:220px;
+              padding:10px;
+              border:1px solid var(--color-border);
+              border-radius:7px;
+            "
+          >
+
+        </div>
+
+        <div style="overflow-x:auto;">
+
+          <table
+            id="tablaInventario"
+            style="
+              width:100%;
+              border-collapse:collapse;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>ID</th>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Unidad</th>
+                <th>Existencia</th>
+                <th>Costo promedio</th>
+                <th>Valor inventario</th>
+                <th>Estado</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td
+                  colspan="8"
+                  style="
+                    text-align:center;
+                    padding:20px;
+                  "
+                >
+                  Cargando inventario...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  const buscadorInventario =
+    document.getElementById(
+      'buscarInventario'
+    );
+
+  if (buscadorInventario) {
+
+    buscadorInventario.addEventListener(
+      'input',
+      aplicarFiltrosInventario
+    );
+
+  }
+
+  cargarInventario();
+
+}
+
   
   
   /*
