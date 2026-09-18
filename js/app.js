@@ -5183,6 +5183,8 @@ async function cambiarEstadoProveedorFrontend(
 
 let clientesActuales = [];
 let inventarioActual = [];  
+let comprasActuales = [];
+  
   
 /*
  * ------------------------------------------------------------
@@ -6961,6 +6963,68 @@ function mostrarVistaCompras() {
   `;
 
 }
+
+async function cargarCompras() {
+
+  const contenedor =
+    document.getElementById('vista-compras');
+
+  if (!contenedor) {
+    return;
+  }
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'compras'
+      });
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudieron cargar las compras.'
+      );
+
+    }
+
+    comprasActuales =
+      respuesta.datos || [];
+
+    mostrarCompras(
+      comprasActuales
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar compras:',
+      error
+    );
+
+    contenedor.innerHTML = `
+      <div class="panel">
+
+        <div class="panel-body">
+
+          <p style="color:#b91c1c;">
+            No se pudieron cargar las compras.
+          </p>
+
+          <p>
+            ${error.message}
+          </p>
+
+        </div>
+
+      </div>
+    `;
+
+  }
+
+}
+  
   
 async function consultarKardex() {
 
