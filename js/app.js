@@ -5175,6 +5175,7 @@ async function cambiarEstadoProveedorFrontend(
 }  
 
 let clientesActuales = [];
+let inventarioActual = [];  
   
 /*
  * ------------------------------------------------------------
@@ -6630,6 +6631,217 @@ function mostrarVistaInventario() {
 
 }
 
+async function cargarInventario() {
+
+  const contenedor =
+    document.getElementById('vista-inventario');
+
+  if (!contenedor) {
+    return;
+  }
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'inventario'
+      });
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo cargar el inventario.'
+      );
+    }
+
+    inventarioActual =
+      respuesta.datos || [];
+
+    mostrarInventario(
+      inventarioActual
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar inventario:',
+      error
+    );
+
+    contenedor.innerHTML = `
+      <div class="panel">
+        <div class="panel-body">
+          <p style="color:#b91c1c;">
+            No se pudo cargar el inventario.
+          </p>
+
+          <p>
+            ${error.message}
+          </p>
+        </div>
+      </div>
+    `;
+
+  }
+
+}
+
+
+function mostrarInventario(inventario) {
+
+  const tabla =
+    document.getElementById(
+      'tablaInventario'
+    );
+
+  if (!tabla) {
+    return;
+  }
+
+  const tbody =
+    tabla.querySelector('tbody');
+
+  if (!tbody) {
+    return;
+  }
+
+  if (
+    !inventario ||
+    inventario.length === 0
+  ) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="8"
+          style="
+            text-align:center;
+            padding:20px;
+          "
+        >
+          No hay productos en el inventario.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  const filas =
+    inventario.map(
+      function(producto) {
+
+        const existencia =
+          Number(
+            producto.existencia || 0
+          );
+
+        const costoPromedio =
+          Number(
+            producto.COSTO_UNITARIO || 0
+          );
+
+        const valorInventario =
+          existencia * costoPromedio;
+
+        const activo =
+          producto.ACTIVO === true;
+
+        return `
+          <tr>
+
+            <td
+              style="
+                text-align:center;
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              ${producto.ID_PRODUCTO || ''}
+            </td>
+
+            <td
+              style="
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              ${producto.CODIGO || ''}
+            </td>
+
+            <td
+              style="
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              ${producto.NOMBRE || ''}
+            </td>
+
+            <td
+              style="
+                text-align:center;
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              ${producto.UNIDAD_MEDIDA || ''}
+            </td>
+
+            <td
+              style="
+                text-align:center;
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              <strong>
+                ${existencia}
+              </strong>
+            </td>
+
+            <td
+              style="
+                text-align:right;
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              S/ ${costoPromedio.toFixed(2)}
+            </td>
+
+            <td
+              style="
+                text-align:right;
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              S/ ${valorInventario.toFixed(2)}
+            </td>
+
+            <td
+              style="
+                text-align:center;
+                padding:12px;
+                border-bottom:1px solid var(--color-border);
+              "
+            >
+              ${activo ? 'Activo' : 'Inactivo'}
+            </td>
+
+          </tr>
+        `;
+
+      }
+    );
+
+  tbody.innerHTML =
+    filas.join('');
+
+}  
+
+  
 function aplicarFiltrosInventario() {
 
   const buscador =
