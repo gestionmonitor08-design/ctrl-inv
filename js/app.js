@@ -6801,6 +6801,163 @@ apiGet({
 
 }
 
+function mostrarVistaCompras() {
+
+  const contenedor =
+    document.getElementById('vista-compras');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="pagina-header">
+
+      <div>
+        <h1>Compras</h1>
+
+        <p>
+          Registra y consulta las compras realizadas.
+        </p>
+      </div>
+
+      <div>
+
+        <button
+          id="btnNuevaCompra"
+          class="btn-primary"
+          type="button"
+        >
+          + Nueva compra
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>Listado de compras</h2>
+
+          <p>
+            Consulta las compras registradas en el sistema.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="panel-body">
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            margin-bottom:15px;
+            flex-wrap:wrap;
+          "
+        >
+
+          <input
+            type="text"
+            id="buscarCompra"
+            placeholder="Buscar por factura..."
+            style="
+              flex:1;
+              min-width:220px;
+              padding:10px;
+              border:1px solid var(--color-border);
+              border-radius:7px;
+            "
+          >
+
+          <select
+            id="filtroEstadoCompra"
+            style="
+              padding:10px;
+              border:1px solid var(--color-border);
+              border-radius:7px;
+            "
+          >
+
+            <option value="todos">
+              Todos
+            </option>
+
+            <option value="ACTIVA">
+              Activas
+            </option>
+
+            <option value="ANULADA">
+              Anuladas
+            </option>
+
+          </select>
+
+        </div>
+
+        <div style="overflow-x:auto;">
+
+          <table
+            id="tablaCompras"
+            style="
+              width:100%;
+              border-collapse:collapse;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Factura</th>
+                <th>Proveedor</th>
+                <th>Subtotal</th>
+                <th>Descuento</th>
+                <th>Impuesto</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td
+                  colspan="10"
+                  style="
+                    text-align:center;
+                    padding:20px;
+                  "
+                >
+                  No hay compras cargadas.
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+}
+  
 async function consultarKardex() {
 
   const selector =
