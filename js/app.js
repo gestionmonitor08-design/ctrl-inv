@@ -81,6 +81,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nombreVista === 'clientes') {
       mostrarVistaClientes();
     }
+
+    if (nombreVista === 'inventario') {
+      mostrarVistaInventario();
+    }
     
   }
 
