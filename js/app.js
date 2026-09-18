@@ -6631,6 +6631,139 @@ function mostrarVistaInventario() {
 
 }
 
+function mostrarVistaKardex() {
+
+  const contenedor =
+    document.getElementById('vista-kardex');
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="pagina-header">
+
+      <div>
+        <h1>Kardex</h1>
+
+        <p>
+          Consulta el historial de movimientos de un producto.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Seleccionar producto</h2>
+
+          <p>
+            Selecciona un producto para consultar sus movimientos.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel-body">
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            align-items:center;
+            flex-wrap:wrap;
+          "
+        >
+
+          <select
+            id="selectorProductoKardex"
+            style="
+              flex:1;
+              min-width:250px;
+              padding:10px;
+              border:1px solid var(--color-border);
+              border-radius:7px;
+            "
+          >
+
+            <option value="">
+              Selecciona un producto
+            </option>
+
+          </select>
+
+          <button
+            id="btnConsultarKardex"
+            class="btn-primary"
+            type="button"
+          >
+            Consultar Kardex
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      id="resultadoKardex"
+      style="margin-top:20px;"
+    ></div>
+  `;
+
+  const selector =
+    document.getElementById(
+      'selectorProductoKardex'
+    );
+
+  if (!selector) {
+    return;
+  }
+
+  const productos =
+    inventarioActual || [];
+
+  productos.forEach(
+    function(producto) {
+
+      const opcion =
+        document.createElement('option');
+
+      opcion.value =
+        producto.ID_PRODUCTO;
+
+      opcion.textContent =
+        producto.CODIGO +
+        ' - ' +
+        producto.NOMBRE;
+
+      selector.appendChild(
+        opcion
+      );
+
+    }
+  );
+
+  const boton =
+    document.getElementById(
+      'btnConsultarKardex'
+    );
+
+  if (boton) {
+
+    boton.addEventListener(
+      'click',
+      consultarKardex
+    );
+
+  }
+
+}
+  
 async function cargarInventario() {
 
   const contenedor =
