@@ -6962,6 +6962,8 @@ function mostrarVistaCompras() {
     </div>
   `;
 
+    cargarCompras();
+
 }
 
 async function cargarCompras() {
@@ -7024,6 +7026,141 @@ async function cargarCompras() {
   }
 
 }
+
+function mostrarCompras(compras) {
+
+  const tabla =
+    document.getElementById(
+      'tablaCompras'
+    );
+
+  if (!tabla) {
+    return;
+  }
+
+  const tbody =
+    tabla.querySelector('tbody');
+
+  if (!tbody) {
+    return;
+  }
+
+  if (
+    !compras ||
+    compras.length === 0
+  ) {
+
+    tbody.innerHTML = `
+      <tr>
+
+        <td
+          colspan="10"
+          style="
+            text-align:center;
+            padding:20px;
+          "
+        >
+          No hay compras registradas.
+        </td>
+
+      </tr>
+    `;
+
+    return;
+  }
+
+  const filas =
+    compras.map(
+      function(compra) {
+
+        const fecha =
+          compra.FECHA
+            ? new Date(
+                compra.FECHA
+              ).toLocaleDateString('es-PE')
+            : '';
+
+        const subtotal =
+          Number(
+            compra.SUBTOTAL || 0
+          );
+
+        const descuento =
+          Number(
+            compra.DESCUENTO || 0
+          );
+
+        const impuesto =
+          Number(
+            compra.IMPUESTO || 0
+          );
+
+        const total =
+          Number(
+            compra.TOTAL || 0
+          );
+
+        return `
+          <tr>
+
+            <td style="padding:10px;">
+              ${compra.ID_COMPRA || ''}
+            </td>
+
+            <td style="padding:10px;">
+              ${fecha}
+            </td>
+
+            <td style="padding:10px;">
+              ${compra.FACTURA || ''}
+            </td>
+
+            <td style="padding:10px;">
+              ${compra.ID_PROVEEDOR || ''}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${subtotal.toFixed(2)}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${descuento.toFixed(2)}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              S/ ${impuesto.toFixed(2)}
+            </td>
+
+            <td style="padding:10px;text-align:right;">
+              <strong>
+                S/ ${total.toFixed(2)}
+              </strong>
+            </td>
+
+            <td style="padding:10px;text-align:center;">
+              ${compra.ESTADO || ''}
+            </td>
+
+            <td style="padding:10px;text-align:center;">
+              <button
+                type="button"
+                class="btn-ver-compra"
+                data-id="${compra.ID_COMPRA}"
+              >
+                Ver
+              </button>
+            </td>
+
+          </tr>
+        `;
+
+      }
+    );
+
+  tbody.innerHTML =
+    filas.join('');
+
+}  
   
   
 async function consultarKardex() {
