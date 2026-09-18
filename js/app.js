@@ -6727,29 +6727,63 @@ function mostrarVistaKardex() {
     return;
   }
 
-  const productos =
-    inventarioActual || [];
+apiGet({
+  accion: 'inventario'
+})
+.then(
+  function(respuesta) {
 
-  productos.forEach(
-    function(producto) {
+    if (!respuesta.ok) {
 
-      const opcion =
-        document.createElement('option');
-
-      opcion.value =
-        producto.ID_PRODUCTO;
-
-      opcion.textContent =
-        producto.CODIGO +
-        ' - ' +
-        producto.NOMBRE;
-
-      selector.appendChild(
-        opcion
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudieron cargar los productos.'
       );
 
     }
-  );
+
+    const productos =
+      respuesta.datos || [];
+
+    productos.forEach(
+      function(producto) {
+
+        const opcion =
+          document.createElement('option');
+
+        opcion.value =
+          producto.ID_PRODUCTO;
+
+        opcion.textContent =
+          producto.CODIGO +
+          ' - ' +
+          producto.NOMBRE;
+
+        selector.appendChild(
+          opcion
+        );
+
+      }
+    );
+
+  }
+)
+.catch(
+  function(error) {
+
+    console.error(
+      'Error al cargar productos para Kardex:',
+      error
+    );
+
+    selector.innerHTML = `
+      <option value="">
+        Error al cargar productos
+      </option>
+    `;
+
+  }
+);
 
   const boton =
     document.getElementById(
