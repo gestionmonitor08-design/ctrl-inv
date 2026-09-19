@@ -7527,7 +7527,7 @@ function mostrarDetalleCompra(datos) {
     </div>
   `;
 
-}  
+}   
   
   
 async function consultarKardex() {
@@ -8105,6 +8105,38 @@ function aplicarFiltrosInventario() {
 
 }
   
+// =====================================================
+// EVENTO PARA BOTONES "VER" DE COMPRAS
+// =====================================================
+
+document.addEventListener('click', function (evento) {
+
+  const boton =
+    evento.target.closest('.btn-ver-compra');
+
+  if (!boton) {
+    return;
+  }
+
+  const idCompra =
+    Number(
+      boton.getAttribute('data-id')
+    );
+
+  if (!idCompra) {
+    console.error(
+      'ID de compra inválido:',
+      boton.getAttribute('data-id')
+    );
+
+    return;
+  }
+
+  verCompraDesdeTabla(idCompra);
+
+});
+
+
   
   /*
    * Eventos del menú
