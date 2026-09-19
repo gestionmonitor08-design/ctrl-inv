@@ -7192,6 +7192,47 @@ function mostrarCompras(compras) {
 
 async function verCompraDesdeTabla(idCompra) {
 
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'compra',
+        idCompra: idCompra
+      });
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo obtener la compra.'
+      );
+
+    }
+
+    mostrarDetalleCompra(
+      respuesta.datos
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al consultar compra:',
+      error
+    );
+
+    alert(
+      'No se pudo consultar la compra.\n\n' +
+      error.message
+    );
+
+  }
+
+}
+  
+  
+
+async function verCompraDesdeTabla(idCompra) {
+
   const confirmarId =
     Number(idCompra);
 
