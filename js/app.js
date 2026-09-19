@@ -7377,15 +7377,478 @@ function mostrarFormularioNuevaCompra() {
     ?.addEventListener(
       'click',
       function () {
-
-        alert(
-          'La selección de productos se implementará en el siguiente paso.'
-        );
-
+        continuarNuevaCompra();
       }
     );
 
 }
+
+function continuarNuevaCompra() {
+
+  const proveedor =
+    document.getElementById(
+      'nuevaCompraProveedor'
+    );
+
+  const factura =
+    document.getElementById(
+      'nuevaCompraFactura'
+    );
+
+  const fecha =
+    document.getElementById(
+      'nuevaCompraFecha'
+    );
+
+  if (!proveedor || !proveedor.value) {
+    alert('Debes seleccionar un proveedor.');
+    return;
+  }
+
+  if (!factura || !factura.value.trim()) {
+    alert('Debes ingresar la factura.');
+    factura?.focus();
+    return;
+  }
+
+  if (!fecha || !fecha.value) {
+    alert('Debes indicar la fecha de la compra.');
+    return;
+  }
+
+  mostrarDetalleNuevaCompra();
+
+}
+
+function mostrarDetalleNuevaCompra() {
+
+  const contenedor =
+    document.getElementById(
+      'vista-compras'
+    );
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+        <h1>Detalle de nueva compra</h1>
+        <p>
+          Agrega los productos incluidos en la compra.
+        </p>
+      </div>
+
+      <div>
+
+        <button
+          type="button"
+          id="btnVolverDatosCompra"
+          style="
+            border:1px solid var(--color-border);
+            background:white;
+            color:#374151;
+            padding:11px 18px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:13px;
+            font-weight:600;
+          "
+        >
+          ← Volver
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Productos</h2>
+          <p>
+            Agrega uno o más productos a la compra.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          id="btnAgregarDetalleCompra"
+          style="
+            border:none;
+            background:var(--color-primary);
+            color:white;
+            padding:10px 16px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:13px;
+            font-weight:600;
+          "
+        >
+          + Agregar producto
+        </button>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <div
+          id="contenedorDetallesNuevaCompra"
+          style="overflow-x:auto;"
+        >
+
+          <table
+            style="
+              width:100%;
+              border-collapse:collapse;
+              font-size:13px;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th style="text-align:left;padding:10px;">
+                  Producto
+                </th>
+
+                <th style="text-align:right;padding:10px;">
+                  Cantidad
+                </th>
+
+                <th style="text-align:right;padding:10px;">
+                  Costo unitario
+                </th>
+
+                <th style="text-align:right;padding:10px;">
+                  Descuento
+                </th>
+
+                <th style="text-align:right;padding:10px;">
+                  Subtotal
+                </th>
+
+                <th style="text-align:right;padding:10px;">
+                  Total
+                </th>
+
+                <th style="text-align:center;padding:10px;">
+                  Acción
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody
+              id="tbodyDetallesNuevaCompra"
+            ></tbody>
+
+          </table>
+
+        </div>
+
+
+        <div
+          id="totalesNuevaCompra"
+          style="
+            margin-top:20px;
+            display:flex;
+            justify-content:flex-end;
+          "
+        ></div>
+
+
+        <div
+          style="
+            margin-top:24px;
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+          "
+        >
+
+          <button
+            type="button"
+            id="btnCancelarDetalleCompra"
+            style="
+              border:1px solid var(--color-border);
+              background:white;
+              color:#374151;
+              padding:11px 18px;
+              border-radius:8px;
+              cursor:pointer;
+              font-size:13px;
+              font-weight:600;
+            "
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            id="btnGuardarCompra"
+            style="
+              border:none;
+              background:var(--color-primary);
+              color:white;
+              padding:11px 18px;
+              border-radius:8px;
+              cursor:pointer;
+              font-size:13px;
+              font-weight:600;
+            "
+          >
+            Guardar compra
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  /*
+   * Agregar producto
+   */
+
+  document
+    .getElementById(
+      'btnAgregarDetalleCompra'
+    )
+    ?.addEventListener(
+      'click',
+      function () {
+
+        agregarFilaDetalleNuevaCompra();
+
+      }
+    );
+
+
+  /*
+   * Volver
+   */
+
+  document
+    .getElementById(
+      'btnVolverDatosCompra'
+    )
+    ?.addEventListener(
+      'click',
+      function () {
+
+        mostrarFormularioNuevaCompra();
+
+      }
+    );
+
+
+  /*
+   * Cancelar
+   */
+
+  document
+    .getElementById(
+      'btnCancelarDetalleCompra'
+    )
+    ?.addEventListener(
+      'click',
+      function () {
+
+        mostrarVistaCompras();
+
+      }
+    );
+
+
+  /*
+   * Primera fila
+   */
+
+  agregarFilaDetalleNuevaCompra();
+
+}
+
+let detallesNuevaCompra = [];
+
+
+function agregarFilaDetalleNuevaCompra() {
+
+  detallesNuevaCompra.push({
+    idProducto: '',
+    cantidad: 1,
+    costoUnitario: 0,
+    descuento: 0
+  });
+
+  renderizarDetallesNuevaCompra();
+
+}
+
+function renderizarDetallesNuevaCompra() {
+
+  const tbody =
+    document.getElementById(
+      'tbodyDetallesNuevaCompra'
+    );
+
+  if (!tbody) {
+    return;
+  }
+
+  tbody.innerHTML =
+    detallesNuevaCompra.map(
+      function(detalle, indice) {
+
+        return `
+
+          <tr>
+
+            <td style="padding:10px;">
+              <select
+                class="detalle-producto"
+                data-indice="${indice}"
+                style="
+                  width:220px;
+                  padding:8px;
+                  border:1px solid var(--color-border);
+                  border-radius:6px;
+                "
+              >
+                <option value="">
+                  Cargando productos...
+                </option>
+              </select>
+            </td>
+
+
+            <td style="padding:10px;">
+              <input
+                type="number"
+                min="0.01"
+                step="0.01"
+                class="detalle-cantidad"
+                data-indice="${indice}"
+                value="${detalle.cantidad}"
+                style="
+                  width:90px;
+                  padding:8px;
+                  border:1px solid var(--color-border);
+                  border-radius:6px;
+                  text-align:right;
+                "
+              >
+            </td>
+
+
+            <td style="padding:10px;">
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                class="detalle-costo"
+                data-indice="${indice}"
+                value="${detalle.costoUnitario}"
+                style="
+                  width:110px;
+                  padding:8px;
+                  border:1px solid var(--color-border);
+                  border-radius:6px;
+                  text-align:right;
+                "
+              >
+            </td>
+
+
+            <td style="padding:10px;">
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                class="detalle-descuento"
+                data-indice="${indice}"
+                value="${detalle.descuento}"
+                style="
+                  width:100px;
+                  padding:8px;
+                  border:1px solid var(--color-border);
+                  border-radius:6px;
+                  text-align:right;
+                "
+              >
+            </td>
+
+
+            <td
+              class="detalle-subtotal"
+              data-indice="${indice}"
+              style="
+                padding:10px;
+                text-align:right;
+              "
+            >
+              S/ 0.00
+            </td>
+
+
+            <td
+              class="detalle-total"
+              data-indice="${indice}"
+              style="
+                padding:10px;
+                text-align:right;
+                font-weight:600;
+              "
+            >
+              S/ 0.00
+            </td>
+
+
+            <td
+              style="
+                padding:10px;
+                text-align:center;
+              "
+            >
+
+              <button
+                type="button"
+                class="btn-eliminar-detalle-compra"
+                data-indice="${indice}"
+              >
+                Eliminar
+              </button>
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    )
+    .join('');
+
+
+  cargarProductosParaDetallesNuevaCompra();
+
+  calcularTotalesNuevaCompra();
+
+}  
+  
+  
 
 async function cargarProveedoresParaNuevaCompra() {
 
