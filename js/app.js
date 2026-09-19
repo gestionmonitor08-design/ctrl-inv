@@ -7228,6 +7228,55 @@ async function verCompraDesdeTabla(idCompra) {
   }
 
 }
+
+// =====================================================
+// VER DETALLE DE UNA COMPRA
+// =====================================================
+
+async function verCompraDesdeTabla(idCompra) {
+
+  console.log('Ver compra - ID:', idCompra);
+
+  try {
+
+    const respuesta = await apiGet({
+      accion: 'compra',
+      idCompra: idCompra
+    });
+
+    console.log(
+      'Respuesta de compra:',
+      respuesta
+    );
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo obtener la compra.'
+      );
+
+    }
+
+    mostrarDetalleCompra(
+      respuesta.datos
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al consultar compra:',
+      error
+    );
+
+    alert(
+      'No se pudo consultar la compra.\n\n' +
+      error.message
+    );
+
+  }
+
+}  
   
   
 
@@ -8055,7 +8104,6 @@ function aplicarFiltrosInventario() {
   );
 
 }
-  
   
   
   /*
