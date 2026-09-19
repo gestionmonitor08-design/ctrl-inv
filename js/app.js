@@ -7017,20 +7017,16 @@ function mostrarVistaCompras() {
     document.getElementById(
       'btnNuevaCompra'
     );
-
+  
   if (btnNuevaCompra) {
-
+  
     btnNuevaCompra.addEventListener(
       'click',
       function () {
-
-        alert(
-          'Formulario de nueva compra pendiente de implementación.'
-        );
-
+        mostrarFormularioNuevaCompra();
       }
     );
-
+  
   }
 
 
@@ -7079,6 +7075,412 @@ function mostrarVistaCompras() {
   cargarCompras();
 
 }
+
+function mostrarFormularioNuevaCompra() {
+
+  const contenedor =
+    document.getElementById(
+      'vista-compras'
+    );
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = `
+
+    <div class="pagina-header">
+
+      <div>
+        <h1>Nueva compra</h1>
+        <p>Registro de una nueva compra</p>
+      </div>
+
+      <div>
+
+        <button
+          type="button"
+          id="btnCancelarNuevaCompra"
+          style="
+            border:1px solid var(--color-border);
+            background:white;
+            color:#374151;
+            padding:11px 18px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:13px;
+            font-weight:600;
+          "
+        >
+          Cancelar
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Datos de la compra</h2>
+          <p>
+            Ingresa los datos generales de la compra.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        <div
+          style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:16px;
+          "
+        >
+
+          <div>
+
+            <label
+              for="nuevaCompraProveedor"
+              style="display:block;margin-bottom:6px;font-weight:600;"
+            >
+              Proveedor
+            </label>
+
+            <select
+              id="nuevaCompraProveedor"
+              style="
+                width:100%;
+                padding:10px 12px;
+                border:1px solid var(--color-border);
+                border-radius:8px;
+              "
+            >
+
+              <option value="">
+                Cargando proveedores...
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div>
+
+            <label
+              for="nuevaCompraFactura"
+              style="display:block;margin-bottom:6px;font-weight:600;"
+            >
+              Factura
+            </label>
+
+            <input
+              type="text"
+              id="nuevaCompraFactura"
+              placeholder="Ej. F001-000123"
+              style="
+                width:100%;
+                padding:10px 12px;
+                border:1px solid var(--color-border);
+                border-radius:8px;
+              "
+            >
+
+          </div>
+
+
+          <div>
+
+            <label
+              for="nuevaCompraFecha"
+              style="display:block;margin-bottom:6px;font-weight:600;"
+            >
+              Fecha
+            </label>
+
+            <input
+              type="date"
+              id="nuevaCompraFecha"
+              style="
+                width:100%;
+                padding:10px 12px;
+                border:1px solid var(--color-border);
+                border-radius:8px;
+              "
+            >
+
+          </div>
+
+
+          <div>
+
+            <label
+              for="nuevaCompraComentario"
+              style="display:block;margin-bottom:6px;font-weight:600;"
+            >
+              Comentario
+            </label>
+
+            <input
+              type="text"
+              id="nuevaCompraComentario"
+              placeholder="Comentario opcional"
+              style="
+                width:100%;
+                padding:10px 12px;
+                border:1px solid var(--color-border);
+                border-radius:8px;
+              "
+            >
+
+          </div>
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:24px;
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+          "
+        >
+
+          <button
+            type="button"
+            id="btnCancelarNuevaCompra2"
+            style="
+              border:1px solid var(--color-border);
+              background:white;
+              color:#374151;
+              padding:11px 18px;
+              border-radius:8px;
+              cursor:pointer;
+              font-size:13px;
+              font-weight:600;
+            "
+          >
+            Cancelar
+          </button>
+
+
+          <button
+            type="button"
+            id="btnContinuarNuevaCompra"
+            style="
+              border:none;
+              background:var(--color-primary);
+              color:white;
+              padding:11px 18px;
+              border-radius:8px;
+              cursor:pointer;
+              font-size:13px;
+              font-weight:600;
+            "
+          >
+            Continuar
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  /*
+   * Fecha actual
+   */
+
+  const fecha =
+    document.getElementById(
+      'nuevaCompraFecha'
+    );
+
+  if (fecha) {
+
+    const hoy =
+      new Date();
+
+    const anio =
+      hoy.getFullYear();
+
+    const mes =
+      String(
+        hoy.getMonth() + 1
+      ).padStart(2, '0');
+
+    const dia =
+      String(
+        hoy.getDate()
+      ).padStart(2, '0');
+
+    fecha.value =
+      `${anio}-${mes}-${dia}`;
+
+  }
+
+
+  /*
+   * Cargar proveedores
+   */
+
+  cargarProveedoresParaNuevaCompra();
+
+
+  /*
+   * Cancelar
+   */
+
+  document
+    .getElementById(
+      'btnCancelarNuevaCompra'
+    )
+    ?.addEventListener(
+      'click',
+      function () {
+        mostrarVistaCompras();
+      }
+    );
+
+
+  document
+    .getElementById(
+      'btnCancelarNuevaCompra2'
+    )
+    ?.addEventListener(
+      'click',
+      function () {
+        mostrarVistaCompras();
+      }
+    );
+
+
+  /*
+   * Continuar
+   */
+
+  document
+    .getElementById(
+      'btnContinuarNuevaCompra'
+    )
+    ?.addEventListener(
+      'click',
+      function () {
+
+        alert(
+          'La selección de productos se implementará en el siguiente paso.'
+        );
+
+      }
+    );
+
+}
+
+async function cargarProveedoresParaNuevaCompra() {
+
+  const selector =
+    document.getElementById(
+      'nuevaCompraProveedor'
+    );
+
+  if (!selector) {
+    return;
+  }
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'proveedores'
+      });
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudieron cargar los proveedores.'
+      );
+    }
+
+    const proveedores =
+      respuesta.datos || [];
+
+    const activos =
+      proveedores.filter(
+        function(proveedor) {
+          return Boolean(
+            proveedor.ACTIVO
+          );
+        }
+      );
+
+    if (activos.length === 0) {
+
+      selector.innerHTML = `
+        <option value="">
+          No hay proveedores activos
+        </option>
+      `;
+
+      return;
+    }
+
+    selector.innerHTML = `
+      <option value="">
+        Selecciona un proveedor
+      </option>
+    `;
+
+    activos.forEach(
+      function(proveedor) {
+
+        const option =
+          document.createElement(
+            'option'
+          );
+
+        option.value =
+          proveedor.ID_PROVEEDOR;
+
+        option.textContent =
+          proveedor.NOMBRE ||
+          'Proveedor ' +
+          proveedor.ID_PROVEEDOR;
+
+        selector.appendChild(
+          option
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar proveedores:',
+      error
+    );
+
+    selector.innerHTML = `
+      <option value="">
+        Error al cargar proveedores
+      </option>
+    `;
+
+  }
+
+}  
+  
   
 
 async function cargarCompras() {
@@ -7302,6 +7704,15 @@ function mostrarCompras(compras) {
 
 function aplicarFiltrosCompras() {
 
+  const detalle =
+    document.getElementById(
+      'resultadoDetalleCompra'
+    );
+
+  if (detalle) {
+    detalle.innerHTML = '';
+  }
+  
   const campoBusqueda =
     document.getElementById(
       'buscarCompra'
