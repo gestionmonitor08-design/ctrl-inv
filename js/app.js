@@ -7847,6 +7847,177 @@ function renderizarDetallesNuevaCompra() {
   calcularTotalesNuevaCompra();
 
 }  
+
+async function cargarProductosParaDetallesNuevaCompra() {
+
+  const selectores =
+    document.querySelectorAll(
+      '.detalle-producto'
+    );
+
+  if (!selectores.length) {
+    return;
+  }
+
+  try {
+
+    const respuesta =
+      await apiGet({
+        accion: 'productos'
+      });
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudieron cargar los productos.'
+      );
+    }
+
+    const productos =
+      respuesta.datos || [];
+
+    const productosActivos =
+      productos.filter(
+        function(producto) {
+          return Boolean(
+            producto.ACTIVO
+          );
+        }
+      );
+
+
+    selectores.forEach(
+      function(selector) {
+
+        const indice =
+          Number(
+            selector.getAttribute(
+              'data-indice'
+            )
+          );
+
+        const detalle =
+          detallesNuevaCompra[indice];
+
+        selector.innerHTML = `
+          <option value="">
+            Selecciona un producto
+          </option>
+        `;
+
+
+        productosActivos.forEach(
+          function(producto) {
+
+            const option =
+              document.createElement(
+                'option'
+              );
+
+            option.value =
+              producto.ID_PRODUCTO;
+
+            option.textContent =
+              producto.CODIGO +
+              ' - ' +
+              producto.NOMBRE;
+
+            if (
+              detalle &&
+              Number(detalle.idProducto) ===
+              Number(producto.ID_PRODUCTO)
+            ) {
+              option.selected = true;
+            }
+
+            selector.appendChild(
+              option
+            );
+
+          }
+        );
+
+
+        selector.addEventListener(
+          'change',
+          function() {
+
+            const indiceActual =
+              Number(
+                this.getAttribute(
+                  'data-indice'
+                )
+              );
+
+            const detalleActual =
+              detallesNuevaCompra[
+                indiceActual
+              ];
+
+            if (!detalleActual) {
+              return;
+            }
+
+            detalleActual.idProducto =
+              this.value
+                ? Number(this.value)
+                : '';
+
+            const productoSeleccionado =
+              productosActivos.find(
+                function(producto) {
+                  return Number(
+                    producto.ID_PRODUCTO
+                  ) === Number(
+                    detalleActual.idProducto
+                  );
+                }
+              );
+
+
+            if (
+              productoSeleccionado
+            ) {
+
+              detalleActual.costoUnitario =
+                Number(
+                  productoSeleccionado.COSTO_UNITARIO || 0
+                );
+
+            }
+
+
+            renderizarDetallesNuevaCompra();
+
+          }
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Error al cargar productos:',
+      error
+    );
+
+    selectores.forEach(
+      function(selector) {
+
+        selector.innerHTML = `
+          <option value="">
+            Error al cargar productos
+          </option>
+        `;
+
+      }
+    );
+
+  }
+
+}
+  
   
   
 
