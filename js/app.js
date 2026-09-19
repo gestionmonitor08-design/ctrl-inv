@@ -6817,22 +6817,28 @@ function mostrarVistaCompras() {
   }
 
   contenedor.innerHTML = `
+
     <div class="pagina-header">
 
       <div>
         <h1>Compras</h1>
-
-        <p>
-          Registra y consulta las compras realizadas.
-        </p>
+        <p>Registro y consulta de compras realizadas</p>
       </div>
 
       <div>
 
         <button
           id="btnNuevaCompra"
-          class="btn-primary"
-          type="button"
+          style="
+            border:none;
+            background:var(--color-primary);
+            color:white;
+            padding:11px 18px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:13px;
+            font-weight:600;
+          "
         >
           + Nueva compra
         </button>
@@ -6841,75 +6847,75 @@ function mostrarVistaCompras() {
 
     </div>
 
+
     <div class="panel">
 
       <div class="panel-header">
 
         <div>
-
-          <h2>Listado de compras</h2>
+          <h2>Compras registradas</h2>
 
           <p>
-            Consulta las compras registradas en el sistema.
+            Consulta y seguimiento de las compras realizadas.
           </p>
-
         </div>
 
       </div>
 
+
       <div
-        id="resultadoDetalleCompra"
-        style="margin-top:20px;"
-      ></div>    
+        style="
+          display:grid;
+          grid-template-columns:minmax(250px,1fr) 180px;
+          gap:12px;
+          margin-bottom:18px;
+        "
+      >
 
-      <div class="panel-body">
-
-        <div
+        <input
+          type="text"
+          id="buscarCompra"
+          placeholder="Buscar por factura..."
           style="
-            display:flex;
-            gap:10px;
-            margin-bottom:15px;
-            flex-wrap:wrap;
+            width:100%;
+            padding:10px 12px;
+            border:1px solid var(--color-border);
+            border-radius:8px;
+            font-size:13px;
           "
         >
 
-          <input
-            type="text"
-            id="buscarCompra"
-            placeholder="Buscar por factura..."
-            style="
-              flex:1;
-              min-width:220px;
-              padding:10px;
-              border:1px solid var(--color-border);
-              border-radius:7px;
-            "
-          >
 
-          <select
-            id="filtroEstadoCompra"
-            style="
-              padding:10px;
-              border:1px solid var(--color-border);
-              border-radius:7px;
-            "
-          >
+        <select
+          id="filtroEstadoCompra"
+          style="
+            width:100%;
+            padding:10px 12px;
+            border:1px solid var(--color-border);
+            border-radius:8px;
+            font-size:13px;
+            background:white;
+          "
+        >
 
-            <option value="todos">
-              Todos
-            </option>
+          <option value="todos">
+            Todos
+          </option>
 
-            <option value="ACTIVA">
-              Activas
-            </option>
+          <option value="REGISTRADA">
+            Registradas
+          </option>
 
-            <option value="ANULADA">
-              Anuladas
-            </option>
+          <option value="ANULADA">
+            Anuladas
+          </option>
 
-          </select>
+        </select>
 
-        </div>
+      </div>
+
+
+      <div class="panel-body">
 
         <div style="overflow-x:auto;">
 
@@ -6918,6 +6924,7 @@ function mostrarVistaCompras() {
             style="
               width:100%;
               border-collapse:collapse;
+              font-size:13px;
             "
           >
 
@@ -6925,35 +6932,60 @@ function mostrarVistaCompras() {
 
               <tr>
 
-                <th>ID</th>
-                <th>Fecha</th>
-                <th>Factura</th>
-                <th>Proveedor</th>
-                <th>Subtotal</th>
-                <th>Descuento</th>
-                <th>Impuesto</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+                <th style="text-align:left;padding:12px;border-bottom:1px solid var(--color-border);">
+                  ID
+                </th>
+
+                <th style="text-align:left;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Fecha
+                </th>
+
+                <th style="text-align:left;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Factura
+                </th>
+
+                <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Proveedor
+                </th>
+
+                <th style="text-align:right;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Subtotal
+                </th>
+
+                <th style="text-align:right;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Descuento
+                </th>
+
+                <th style="text-align:right;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Impuesto
+                </th>
+
+                <th style="text-align:right;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Total
+                </th>
+
+                <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Estado
+                </th>
+
+                <th style="text-align:center;padding:12px;border-bottom:1px solid var(--color-border);">
+                  Acciones
+                </th>
 
               </tr>
 
             </thead>
 
+
             <tbody>
 
               <tr>
-
                 <td
                   colspan="10"
-                  style="
-                    text-align:center;
-                    padding:20px;
-                  "
+                  style="padding:20px;text-align:center;"
                 >
-                  No hay compras cargadas.
+                  Cargando compras...
                 </td>
-
               </tr>
 
             </tbody>
@@ -6965,11 +6997,89 @@ function mostrarVistaCompras() {
       </div>
 
     </div>
+
+
+    <!-- RESULTADO DEL DETALLE -->
+
+    <div
+      id="resultadoDetalleCompra"
+      style="margin-top:20px;"
+    ></div>
+
   `;
 
-    cargarCompras();
+
+  /*
+   * Botón Nueva Compra
+   */
+
+  const btnNuevaCompra =
+    document.getElementById(
+      'btnNuevaCompra'
+    );
+
+  if (btnNuevaCompra) {
+
+    btnNuevaCompra.addEventListener(
+      'click',
+      function () {
+
+        alert(
+          'Formulario de nueva compra pendiente de implementación.'
+        );
+
+      }
+    );
+
+  }
+
+
+  /*
+   * Búsqueda de compras
+   */
+
+  const buscarCompra =
+    document.getElementById(
+      'buscarCompra'
+    );
+
+  if (buscarCompra) {
+
+    buscarCompra.addEventListener(
+      'input',
+      aplicarFiltrosCompras
+    );
+
+  }
+
+
+  /*
+   * Filtro por estado
+   */
+
+  const filtroEstadoCompra =
+    document.getElementById(
+      'filtroEstadoCompra'
+    );
+
+  if (filtroEstadoCompra) {
+
+    filtroEstadoCompra.addEventListener(
+      'change',
+      aplicarFiltrosCompras
+    );
+
+  }
+
+
+  /*
+   * Cargar compras
+   */
+
+  cargarCompras();
 
 }
+  
 
 async function cargarCompras() {
 
@@ -7189,6 +7299,89 @@ function mostrarCompras(compras) {
     filas.join('');
 
 }  
+
+function aplicarFiltrosCompras() {
+
+  const campoBusqueda =
+    document.getElementById(
+      'buscarCompra'
+    );
+
+  const selectorEstado =
+    document.getElementById(
+      'filtroEstadoCompra'
+    );
+
+  if (
+    !campoBusqueda ||
+    !selectorEstado
+  ) {
+    return;
+  }
+
+
+  const texto =
+    campoBusqueda.value
+      .trim()
+      .toLowerCase();
+
+  const estado =
+    selectorEstado.value;
+
+
+  const comprasFiltradas =
+    comprasActuales.filter(
+      function(compra) {
+
+        const idCompra =
+          String(
+            compra.ID_COMPRA || ''
+          )
+            .toLowerCase();
+
+        const factura =
+          String(
+            compra.FACTURA || ''
+          )
+            .toLowerCase();
+
+        const proveedor =
+          String(
+            compra.ID_PROVEEDOR || ''
+          )
+            .toLowerCase();
+
+
+        const coincideBusqueda =
+          !texto ||
+          idCompra.includes(texto) ||
+          factura.includes(texto) ||
+          proveedor.includes(texto);
+
+
+        const coincideEstado =
+          estado === 'todos' ||
+          String(
+            compra.ESTADO || ''
+          ).toUpperCase() ===
+          estado.toUpperCase();
+
+
+        return (
+          coincideBusqueda &&
+          coincideEstado
+        );
+
+      }
+    );
+
+
+  mostrarCompras(
+    comprasFiltradas
+  );
+
+}
+  
 
 async function verCompraDesdeTabla(idCompra) {
 
