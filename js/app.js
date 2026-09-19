@@ -7683,6 +7683,273 @@ function mostrarDetalleNuevaCompra() {
 
 let detallesNuevaCompra = [];
 
+/*
+ * Actualizar cálculos al modificar
+ * cantidad, costo o descuento
+ */
+
+const contenedorDetalles =
+  document.getElementById(
+    'contenedorDetallesNuevaCompra'
+  );
+
+if (contenedorDetalles) {
+
+  contenedorDetalles.addEventListener(
+    'input',
+    function(evento) {
+
+      const elemento =
+        evento.target;
+
+      if (
+        !elemento.classList.contains(
+          'detalle-cantidad'
+        ) &&
+        !elemento.classList.contains(
+          'detalle-costo'
+        ) &&
+        !elemento.classList.contains(
+          'detalle-descuento'
+        )
+      ) {
+        return;
+      }
+
+
+      const indice =
+        Number(
+          elemento.getAttribute(
+            'data-indice'
+          )
+        );
+
+      const detalle =
+        detallesNuevaCompra[indice];
+
+      if (!detalle) {
+        return;
+      }
+
+
+      if (
+        elemento.classList.contains(
+          'detalle-cantidad'
+        )
+      ) {
+
+        detalle.cantidad =
+          Number(
+            elemento.value || 0
+          );
+
+      }
+
+
+      if (
+        elemento.classList.contains(
+          'detalle-costo'
+        )
+      ) {
+
+        detalle.costoUnitario =
+          Number(
+            elemento.value || 0
+          );
+
+      }
+
+
+      if (
+        elemento.classList.contains(
+          'detalle-descuento'
+        )
+      ) {
+
+        detalle.descuento =
+          Number(
+            elemento.value || 0
+          );
+
+      }
+
+
+      calcularTotalesNuevaCompra();
+
+    }
+  );
+
+}
+
+function calcularTotalesNuevaCompra() {
+
+  let subtotalGeneral = 0;
+  let descuentoGeneral = 0;
+  let totalGeneral = 0;
+
+
+  detallesNuevaCompra.forEach(
+    function(detalle, indice) {
+
+      const cantidad =
+        Number(
+          detalle.cantidad || 0
+        );
+
+      const costoUnitario =
+        Number(
+          detalle.costoUnitario || 0
+        );
+
+      const descuento =
+        Number(
+          detalle.descuento || 0
+        );
+
+
+      const subtotal =
+        cantidad *
+        costoUnitario;
+
+
+      const total =
+        Math.max(
+          subtotal - descuento,
+          0
+        );
+
+
+      subtotalGeneral +=
+        subtotal;
+
+      descuentoGeneral +=
+        descuento;
+
+      totalGeneral +=
+        total;
+
+
+      const elementoSubtotal =
+        document.querySelector(
+          '.detalle-subtotal[data-indice="' +
+          indice +
+          '"]'
+        );
+
+      const elementoTotal =
+        document.querySelector(
+          '.detalle-total[data-indice="' +
+          indice +
+          '"]'
+        );
+
+
+      if (elementoSubtotal) {
+
+        elementoSubtotal.textContent =
+          'S/ ' +
+          subtotal.toFixed(2);
+
+      }
+
+
+      if (elementoTotal) {
+
+        elementoTotal.textContent =
+          'S/ ' +
+          total.toFixed(2);
+
+      }
+
+    }
+  );
+
+
+  const contenedorTotales =
+    document.getElementById(
+      'totalesNuevaCompra'
+    );
+
+  if (!contenedorTotales) {
+    return;
+  }
+
+
+  contenedorTotales.innerHTML = `
+
+    <div
+      style="
+        width:320px;
+        border-top:1px solid var(--color-border);
+        padding-top:12px;
+      "
+    >
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          margin-bottom:8px;
+        "
+      >
+
+        <span>
+          Subtotal:
+        </span>
+
+        <strong>
+          S/ ${subtotalGeneral.toFixed(2)}
+        </strong>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          margin-bottom:8px;
+        "
+      >
+
+        <span>
+          Descuento:
+        </span>
+
+        <strong>
+          S/ ${descuentoGeneral.toFixed(2)}
+        </strong>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          padding-top:10px;
+          border-top:1px solid var(--color-border);
+          font-size:16px;
+        "
+      >
+
+        <span>
+          Total:
+        </span>
+
+        <strong>
+          S/ ${totalGeneral.toFixed(2)}
+        </strong>
+
+      </div>
+
+    </div>
+
+  `;
+
+}  
+  
+
 
 function agregarFilaDetalleNuevaCompra() {
 
