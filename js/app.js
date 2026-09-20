@@ -7675,6 +7675,107 @@ function mostrarDetalleNuevaCompra() {
       }
     );
 
+/*
+ * Actualizar cálculos al modificar
+ * cantidad, costo o descuento
+ */
+
+const contenedorDetalles =
+  document.getElementById(
+    'contenedorDetallesNuevaCompra'
+  );
+
+if (contenedorDetalles) {
+
+  contenedorDetalles.addEventListener(
+    'input',
+    function(evento) {
+
+      const elemento =
+        evento.target;
+
+
+      if (
+        !elemento.classList.contains(
+          'detalle-cantidad'
+        ) &&
+        !elemento.classList.contains(
+          'detalle-costo'
+        ) &&
+        !elemento.classList.contains(
+          'detalle-descuento'
+        )
+      ) {
+        return;
+      }
+
+
+      const indice =
+        Number(
+          elemento.getAttribute(
+            'data-indice'
+          )
+        );
+
+
+      const detalle =
+        detallesNuevaCompra[indice];
+
+
+      if (!detalle) {
+        return;
+      }
+
+
+      if (
+        elemento.classList.contains(
+          'detalle-cantidad'
+        )
+      ) {
+
+        detalle.cantidad =
+          Number(
+            elemento.value || 0
+          );
+
+      }
+
+
+      if (
+        elemento.classList.contains(
+          'detalle-costo'
+        )
+      ) {
+
+        detalle.costoUnitario =
+          Number(
+            elemento.value || 0
+          );
+
+      }
+
+
+      if (
+        elemento.classList.contains(
+          'detalle-descuento'
+        )
+      ) {
+
+        detalle.descuento =
+          Number(
+            elemento.value || 0
+          );
+
+      }
+
+
+      calcularTotalesNuevaCompra();
+
+    }
+  );
+
+}
+  
 
   /*
    * Primera fila
