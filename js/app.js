@@ -7831,6 +7831,301 @@ if (contenedorDetalles) {
   );
 
 }
+
+
+async function guardarNuevaCompra() {
+
+  const boton =
+    document.getElementById(
+      'btnGuardarCompra'
+    );
+
+  const proveedor =
+    document.getElementById(
+      'nuevaCompraProveedor'
+    );
+
+  const factura =
+    document.getElementById(
+      'nuevaCompraFactura'
+    );
+
+  const fecha =
+    document.getElementById(
+      'nuevaCompraFecha'
+    );
+
+  const comentario =
+    document.getElementById(
+      'nuevaCompraComentario'
+    );
+
+
+  if (
+    !proveedor ||
+    !proveedor.value
+  ) {
+
+    alert(
+      'Debes seleccionar un proveedor.'
+    );
+
+    return;
+  }
+
+
+  if (
+    !factura ||
+    !factura.value.trim()
+  ) {
+
+    alert(
+      'Debes ingresar la factura.'
+    );
+
+    return;
+  }
+
+
+  if (
+    !fecha ||
+    !fecha.value
+  ) {
+
+    alert(
+      'Debes indicar la fecha.'
+    );
+
+    return;
+  }
+
+
+  if (
+    !detallesNuevaCompra ||
+    detallesNuevaCompra.length === 0
+  ) {
+
+    alert(
+      'La compra debe tener al menos un producto.'
+    );
+
+    return;
+  }
+
+
+  for (
+    let i = 0;
+    i < detallesNuevaCompra.length;
+    i++
+  ) {
+
+    const detalle =
+      detallesNuevaCompra[i];
+
+
+    if (
+      !detalle.idProducto
+    ) {
+
+      alert(
+        'Debes seleccionar un producto en la línea ' +
+        (i + 1) +
+        '.'
+      );
+
+      return;
+    }
+
+
+    if (
+      Number(detalle.cantidad) <= 0
+    ) {
+
+      alert(
+        'La cantidad debe ser mayor que cero en la línea ' +
+        (i + 1) +
+        '.'
+      );
+
+      return;
+    }
+
+
+    if (
+      Number(detalle.costoUnitario) < 0
+    ) {
+
+      alert(
+        'El costo unitario no puede ser negativo en la línea ' +
+        (i + 1) +
+        '.'
+      );
+
+      return;
+    }
+
+
+    if (
+      Number(detalle.descuento) < 0
+    ) {
+
+      alert(
+        'El descuento no puede ser negativo en la línea ' +
+        (i + 1) +
+        '.'
+      );
+
+      return;
+    }
+
+  }
+
+
+  const datosCompra = {
+
+    fecha:
+      fecha.value,
+
+    idProveedor:
+      Number(
+        proveedor.value
+      ),
+
+    factura:
+      factura.value.trim(),
+
+    comentario:
+      comentario
+        ? comentario.value.trim()
+        : '',
+
+    idUsuario:
+      1,
+
+    detalles:
+      detallesNuevaCompra.map(
+        function(detalle) {
+
+          return {
+
+            idProducto:
+              Number(
+                detalle.idProducto
+              ),
+
+            cantidad:
+              Number(
+                detalle.cantidad
+              ),
+
+            costoUnitario:
+              Number(
+                detalle.costoUnitario
+              ),
+
+            descuento:
+              Number(
+                detalle.descuento || 0
+              ),
+
+            impuesto:
+              0
+
+          };
+
+        }
+      )
+
+  };
+
+
+  try {
+
+    if (boton) {
+
+      boton.disabled =
+        true;
+
+      boton.textContent =
+        'Guardando...';
+
+    }
+
+
+    console.log(
+      'Datos enviados para nueva compra:',
+      datosCompra
+    );
+
+
+    const respuesta =
+      await apiPost({
+
+        accion:
+          'registrarCompraCompleta',
+
+        datos:
+          datosCompra
+
+      });
+
+
+    console.log(
+      'Respuesta registrarCompraCompleta:',
+      respuesta
+    );
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        respuesta.mensaje ||
+        'No se pudo registrar la compra.'
+      );
+
+    }
+
+
+    alert(
+      'Compra registrada correctamente.'
+    );
+
+
+    detallesNuevaCompra = [];
+
+
+    mostrarVistaCompras();
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al guardar compra:',
+      error
+    );
+
+
+    alert(
+      'No se pudo registrar la compra.\n\n' +
+      error.message
+    );
+
+
+  } finally {
+
+    if (boton) {
+
+      boton.disabled =
+        false;
+
+      boton.textContent =
+        'Guardar compra';
+
+    }
+
+  }
+
+}
   
 
   /*
