@@ -7687,6 +7687,62 @@ const contenedorDetalles =
 
 if (contenedorDetalles) {
 
+    contenedorDetalles.addEventListener(
+    'click',
+    function(evento) {
+
+      const boton =
+        evento.target.closest(
+          '.btn-eliminar-detalle-compra'
+        );
+
+      if (!boton) {
+        return;
+      }
+
+
+      const indice =
+        Number(
+          boton.getAttribute(
+            'data-indice'
+          )
+        );
+
+
+      if (
+        Number.isNaN(indice) ||
+        !detallesNuevaCompra[indice]
+      ) {
+        return;
+      }
+
+
+      if (
+        detallesNuevaCompra.length === 1
+      ) {
+
+        alert(
+          'La compra debe tener al menos un producto.'
+        );
+
+        return;
+
+      }
+
+
+      detallesNuevaCompra.splice(
+        indice,
+        1
+      );
+
+
+      renderizarDetallesNuevaCompra();
+
+    }
+  ); 
+
+  
+
   contenedorDetalles.addEventListener(
     'input',
     function(evento) {
